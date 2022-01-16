@@ -1,1 +1,0 @@
-document.getElementById("test").innerHTML = "test.js loaded and run.";

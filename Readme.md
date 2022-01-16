@@ -13,4 +13,16 @@ Please note that you will need to update requirements.txt with any new requireme
 
 The WSGI server gives off a warning saying "WARNING: This is a development server. Do not use it in a production deployment." if you run it without 'development' mode on. On heroku we run using Gunicorn instead. This is controlled with the Procfile.<br/>
 
-Note: HTTP response 304 is for "Redirection to a previously cached result".
+On Heroku WEB_CONCURRENCY config variable is set to 3 as per https://devcenter.heroku.com/articles/python-gunicorn <br/>
+
+HTML Escaping / Sanitizing inputs: <br/>
+from markupsafe import escape <br/>
+... return f"Hello, {escape(name)}!" <br/>
+
+Templates rendered with Jinja will escape user values automatically. <br/>
+
+Note: HTTP response 304 is for "Redirection to a previously cached result". <br/>
+
+Flask quickstart: https://flask.palletsprojects.com/en/2.0.x/quickstart/ <br/>
+
+Bootstrap components: https://getbootstrap.com/docs/5.0/customize/components/ <br/> 

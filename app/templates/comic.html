@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %} Comic Scraper {% endblock %}
+
+{% block body %}
+
+<div class="min-vw-100 vh-100 d-flex" style="background-color: #eee;">
+    <div class="mx-auto my-auto" style="max-width: 75%; min-width: 75%;" >
+    <div>
+
+
+        Enter a readcomiconline.li URL in the box. <br/> 
+        Press "Info" to retrive data about the comic. <br/> <br/>
+        Example: <br/> 
+        https://readcomiconline.li/Comic/Sandman-Presents-Lucifer <br/> <br/>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <button class="btn btn-outline-secondary" id="infobutton" type="button">Info</button>
+            </div>
+            <input type="text" id="comicurl" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1">
+        </div>
+        
+        <div class="form-outline">
+            <input
+              class="form-control"
+              id="urldisplay"
+              type="text"
+              placeholder="URL:"
+              aria-label="Comic URL"
+              readonly /> 
+            <label class="form-label" for="urldisplay"></label>
+          </div>
+
+        <div class="form-outline">
+            <input
+              class="form-control"
+              id="titledisplay"
+              type="text"
+              placeholder="Title:"
+              aria-label="Comic Title"
+              readonly /> 
+            <label class="form-label" for="titledisplay"></label>
+          </div>
+
+        <div class="form-outline">
+            <input
+                class="form-control"
+                id="singleissuedisplay"
+                type="text"
+                placeholder="Single Issue Provided:"
+                aria-label="Comic Single Issue"
+                readonly /> 
+            <label class="form-label" for="singleissuedisplay"></label>
+        </div>
+
+
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+
+let infobutton = document.getElementById("infobutton");
+let urlbox = document.getElementById("comicurl");
+let urldisplay = document.getElementById("urldisplay");
+let titledisplay = document.getElementById("titledisplay");
+let singleissuedisplay = document.getElementById("singleissuedisplay");
+
+let url = "{{ url_for('comicInfo') }}";
+
+infobutton.addEventListener('click', (e) => {
+
+    let body = {"url": urlbox.value};
+
+    let requestOptions = {
+        body: JSON.stringify(body),
+        headers: {
+            "Content-Type": "application/json"
+        },
+        method: "POST"
+    }
+
+    fetch(url, requestOptions).then(
+        function(response) {
+            return response.json();
+    }).then(function(result) {
+        urldisplay.value = "URL: " + urlbox.value
+        titledisplay.value = "Title: " + result['title']
+        let si = result['singleissue'] ? "Yes" : "No"
+        singleissuedisplay.value = "Single Issue Provided: " + si
+    }).catch(function(err) {
+        console.log(err);
+    });
+
+})
+
+</script>
+
+
+{% endblock %}
