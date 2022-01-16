@@ -21,33 +21,45 @@
         </div>
         
         <div class="form-outline">
+            <label for="urldisplay">
+                <span class="text-muted">URL:</span> 
+              </label>
+
             <input
               class="form-control"
               id="urldisplay"
               type="text"
-              placeholder="URL:"
+              placeholder="https://readcomiconline.li/Comic/Sandman-Presents-Lucifer"
               aria-label="Comic URL"
               readonly /> 
             <label class="form-label" for="urldisplay"></label>
           </div>
 
         <div class="form-outline">
+            <label for="titledisplay">
+                <span class="text-muted">Title:</span> 
+              </label>
+
             <input
               class="form-control"
               id="titledisplay"
               type="text"
-              placeholder="Title:"
+              placeholder="Sandman-Presents-Lucifer"
               aria-label="Comic Title"
               readonly /> 
             <label class="form-label" for="titledisplay"></label>
           </div>
 
         <div class="form-outline">
+            <label for="singleissuedisplay">
+                <span class="text-muted">Single Issue Link Provided?</span> 
+              </label>
+
             <input
                 class="form-control"
                 id="singleissuedisplay"
                 type="text"
-                placeholder="Single Issue Provided:"
+                placeholder="No"
                 aria-label="Comic Single Issue"
                 readonly /> 
             <label class="form-label" for="singleissuedisplay"></label>
@@ -85,10 +97,9 @@ infobutton.addEventListener('click', (e) => {
         function(response) {
             return response.json();
     }).then(function(result) {
-        urldisplay.value = "URL: " + urlbox.value
-        titledisplay.value = "Title: " + result['title']
-        let si = result['singleissue'] ? "Yes" : "No"
-        singleissuedisplay.value = "Single Issue Provided: " + si
+        urldisplay.value = urlbox.value
+        titledisplay.value = result['title']
+        singleissuedisplay.value = result['singleissue'] ? "Yes" : "No"
     }).catch(function(err) {
         console.log(err);
     });
