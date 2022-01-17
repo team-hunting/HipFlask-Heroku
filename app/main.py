@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request
+import requests
+from bs4 import BeautifulSoup as bs
 
 app = Flask(__name__)
 
@@ -42,3 +44,60 @@ def getComicTitle(url, issue=False):
         title = titlePieces[0] + "-" + issueTitle
 
     return title
+
+@app.route('/api/comic/issueinfo', methods=['POST'])
+def issueInfo():
+    content_type = request.headers.get('Content-Type')
+
+    if content_type == 'application/json':
+        content = request.get_json()
+        print("CONTENT: " + str(content))
+        url = content['url']
+        title = content['title']
+        issueLinks = getLinksFromStartPage(url)
+        print("STARTURL :   " + url)
+        # issues = [(getIssueName(issueLink, url + "/Comic/" + title), issueLink) for issueLink in issueLinks]
+        issues = [(getIssueName(issueLink, "/Comic/" + title), issueLink) for issueLink in issueLinks]
+        print(issues)
+        
+        return {}
+        return getLinksFromStartPage(url)
+
+    else:
+        return {}
+
+def getLinksFromStartPage(url):
+    headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Max-Age': '3600',
+        'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0'
+    }
+
+    req = requests.get(url, headers)
+    soup = bs(req.content, 'html.parser')
+
+    links = soup.find_all('a')
+    linkArrayRaw = []
+    for link in links:
+        if link.get('href') != None:
+            linkArrayRaw.append(link.get('href'))
+
+    linkArray = []
+    for link in linkArrayRaw:
+        if link.startswith('/Comic/'):
+            linkArray.append(link)
+
+    linkArray.reverse()
+
+    return linkArray
+
+def getIssueName(issueLink, startURL):
+    # first get the issue name/number.
+    # remove the start url, trim the leading /, and everything after the ?
+    # issueName = issueLink.replace(startURL, "")
+    issueName = issueLink.replace(startURL, "", 1)[0:].split("?",1)[0]
+    if issueName[0] == "/":
+        issueName = issueName[1:]
+    return issueName
