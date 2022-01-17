@@ -37,6 +37,8 @@ def getComicTitle(url, issue=False):
     if title[-1] == "/":
         title = title[:-1]
 
+    if "?id=" in url:
+        issue = True
     if issue:
         # Add the issue number to the title
         titlePieces =   title.split("/")
@@ -53,10 +55,10 @@ def issueInfo():
         content = request.get_json()
         print("CONTENT: " + str(content))
         url = content['url']
-        title = content['title']
+        title = getComicTitle(url)
         issueLinks = getLinksFromStartPage(url)
         print("STARTURL :   " + url)
-        issues = [(getIssueName(issueLink, "/Comic/" + title), issueLink) for issueLink in issueLinks]
+        issues = [(getIssueName(issueLink, "/Comic/" + title), "https://readcomiconline.li" + issueLink) for issueLink in issueLinks]
         print(issues)
         
         #TODO: process the issue tuples using JS in comic.html

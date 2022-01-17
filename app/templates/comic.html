@@ -118,7 +118,10 @@ let issuebutton = document.getElementById("getissuebutton");
 
 issuebutton.addEventListener('click', (e) => {
 
-let body = {"url": urldisplay.value, "title": titledisplay.value};
+let body = {
+  "url": urlbox.value == "" ? "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer" : urlbox.value
+};
+
 console.log(body)
 
 let requestOptions = {
@@ -132,15 +135,28 @@ let requestOptions = {
 fetch(issueUrl, requestOptions).then(
     function(response) {
       console.log(response)
-      return response
-        //return response.json();
+      return response.json();
 }).then(function(result) {
+    //TODO: 
+    //for issue in result['issues'] 
+    //Add "&readType=1" to issue Link 
+    //If they've ticked an HQ box, add "&quality=hq" as well
+    //display issue[0]  -- Issue Title
+    //display issue[1]  -- Issue Link
+    //display button to begin scraping single issue
+    //display button to begin scraping All
     console.log(result)
 }).catch(function(err) {
     console.log(err);
 });
 
 })
+
+// Scraping button:
+// On click, document.queryselect all elements with issue links stored in them
+// foreach element:
+// fetch to api with URL 
+// When fetch completes, generate that many IMG elements on page send the first link to the API for scraping images
 
 </script>
 
