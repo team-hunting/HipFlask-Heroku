@@ -8,9 +8,9 @@ app = Flask(__name__)
 def index():
     return render_template('comic.html')
 
-@app.route('/comic')
-def test():
-    return render_template('comic.html')
+@app.route('/pirate')
+def pirate():
+    return render_template('piratesearch.html')
 
 @app.route('/api/comic/comicinfo', methods=['POST'])
 def comicInfo():
@@ -28,24 +28,6 @@ def comicInfo():
         print(content['url'])
 
     return {"title": comicTitle, "singleissue": singleIssue}
-
-
-def getComicTitle(url, issue=False):
-    prefix = "https://readcomiconline.li"
-    startURL = prefix + "/Comic/"
-    title = url.replace(startURL, "", 1)
-    if title[-1] == "/":
-        title = title[:-1]
-
-    if "?id=" in url:
-        issue = True
-    if issue:
-        # Add the issue number to the title
-        titlePieces =   title.split("/")
-        issueTitle = titlePieces[1].split("?")[0]
-        title = titlePieces[0] + "-" + issueTitle
-
-    return title
 
 @app.route('/api/comic/issueinfo', methods=['POST'])
 def issueInfo():
@@ -66,6 +48,23 @@ def issueInfo():
 
     else:
         return {}
+
+def getComicTitle(url, issue=False):
+    prefix = "https://readcomiconline.li"
+    startURL = prefix + "/Comic/"
+    title = url.replace(startURL, "", 1)
+    if title[-1] == "/":
+        title = title[:-1]
+
+    if "?id=" in url:
+        issue = True
+    if issue:
+        # Add the issue number to the title
+        titlePieces =   title.split("/")
+        issueTitle = titlePieces[1].split("?")[0]
+        title = titlePieces[0] + "-" + issueTitle
+
+    return title
 
 def getLinksFromStartPage(url):
     headers = {
