@@ -8,9 +8,9 @@ app = Flask(__name__)
 def index():
     return render_template('comic.html')
 
-@app.route('/pirate')
-def pirate():
-    return render_template('piratesearch.html')
+@app.route('/urlsearch')
+def urlsearch():
+    return render_template('urlsearch.html')
 
 @app.route('/api/comic/comicinfo', methods=['POST'])
 def comicInfo():

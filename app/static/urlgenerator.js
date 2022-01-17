@@ -5,13 +5,6 @@ const classNames = {
 
 const categories = ["software","movies","ebooks","textbooks","audiobooks","anime","games","torrent"]
 
-// class PirateSite {
-//   constructor(search_url,categories) {
-//     this.search_url = search_url;
-//     this.categories = categories;
-//   }
-// }
-
 function generateUrlArray(search_term,category) {
   switch(category) {
     case "software":
