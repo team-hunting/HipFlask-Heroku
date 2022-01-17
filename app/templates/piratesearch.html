@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block head %} 
+<script src="{{ url_for('static', filename='urlgenerator.js') }}"></script> 
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}" />
+{% endblock %}
+
+{% block title %} Searcher {% endblock %}
+
+{% block body %}
+
+    <div class="container center">
+
+      <h1 class="center title">Search Your Favorite Sites</h1>
+      <br>
+
+      <div class="center input">
+        <input type="text" id="search_term" name="search_term"><br><br>
+      </div>
+      
+      <div class="center input">
+      <input type="checkbox" id="software" name="software">
+      <label for="software">Software</label>
+
+      <input type="checkbox" id="games" name="games">
+      <label for="games">Games</label>
+
+      <input type="checkbox" id="movies" name="movies">
+      <label for="movies">Movies</label> 
+
+      <br>
+
+      <input type="checkbox" id="ebooks" name="ebooks">
+      <label for="ebooks">Ebooks</label>
+
+      <input type="checkbox" id="audiobooks" name="audiobooks">
+      <label for="audiobooks">Audiobooks</label>
+
+      <input type="checkbox" id="anime" name="anime">
+      <label for="anime">Anime</label>
+      </div>
+      
+      <div class="center">
+        <br>
+      <button id="search_button" class="button center" onclick="runSearch()">Search</button>
+      </div>
+
+      <script>
+        let input = document.getElementById("search_term");
+        input.addEventListener("keyup", function(event) {
+          if (event.keyCode === 13) {
+            event.preventDefault();
+            document.getElementById("search_button").click();
+          }
+        }); 
+      </script>
+
+    </div>
+
+{% endblock %}

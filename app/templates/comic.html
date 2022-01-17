@@ -65,6 +65,7 @@
             <label class="form-label" for="singleissuedisplay"></label>
         </div>
 
+        <button id="getissuebutton">PRESS ME TO GET ISSUES</button>
 
     </div>
   </div>
@@ -82,8 +83,15 @@ let singleissuedisplay = document.getElementById("singleissuedisplay");
 let url = "{{ url_for('comicInfo') }}";
 
 infobutton.addEventListener('click', (e) => {
+    let body = "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer";
 
-    let body = {"url": urlbox.value};
+    if (urlbox.value == "") {
+      console.log("You need to enter a URL... Selecting default")
+      body = {"url": "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer"};
+    }
+    else {
+      body = {"url": urlbox.value};
+    } 
 
     let requestOptions = {
         body: JSON.stringify(body),
@@ -97,14 +105,58 @@ infobutton.addEventListener('click', (e) => {
         function(response) {
             return response.json();
     }).then(function(result) {
-        urldisplay.value = urlbox.value
+        urldisplay.value = body['url']
         titledisplay.value = result['title']
         singleissuedisplay.value = result['singleissue'] ? "Yes" : "No"
     }).catch(function(err) {
         console.log(err);
     });
+})
+
+let issueUrl = "{{ url_for('issueInfo') }}";
+let issuebutton = document.getElementById("getissuebutton");
+
+issuebutton.addEventListener('click', (e) => {
+
+let body = {
+  "url": urlbox.value == "" ? "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer" : urlbox.value
+};
+
+console.log(body)
+
+let requestOptions = {
+    body: JSON.stringify(body),
+    headers: {
+        "Content-Type": "application/json"
+    },
+    method: "POST"
+}
+
+fetch(issueUrl, requestOptions).then(
+    function(response) {
+      console.log(response)
+      return response.json();
+}).then(function(result) {
+    //TODO: 
+    //for issue in result['issues'] 
+    //Add "&readType=1" to issue Link 
+    //If they've ticked an HQ box, add "&quality=hq" as well
+    //display issue[0]  -- Issue Title
+    //display issue[1]  -- Issue Link
+    //display button to begin scraping single issue
+    //display button to begin scraping All
+    console.log(result)
+}).catch(function(err) {
+    console.log(err);
+});
 
 })
+
+// Scraping button:
+// On click, document.queryselect all elements with issue links stored in them
+// foreach element:
+// fetch to api with URL 
+// When fetch completes, generate that many IMG elements on page send the first link to the API for scraping images
 
 </script>
 
