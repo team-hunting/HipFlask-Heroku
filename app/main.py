@@ -56,12 +56,11 @@ def issueInfo():
         title = content['title']
         issueLinks = getLinksFromStartPage(url)
         print("STARTURL :   " + url)
-        # issues = [(getIssueName(issueLink, url + "/Comic/" + title), issueLink) for issueLink in issueLinks]
         issues = [(getIssueName(issueLink, "/Comic/" + title), issueLink) for issueLink in issueLinks]
         print(issues)
         
-        return {}
-        return getLinksFromStartPage(url)
+        #TODO: process the issue tuples using JS in comic.html
+        return {"title": title, "issues": issues}
 
     else:
         return {}
@@ -94,9 +93,7 @@ def getLinksFromStartPage(url):
     return linkArray
 
 def getIssueName(issueLink, startURL):
-    # first get the issue name/number.
     # remove the start url, trim the leading /, and everything after the ?
-    # issueName = issueLink.replace(startURL, "")
     issueName = issueLink.replace(startURL, "", 1)[0:].split("?",1)[0]
     if issueName[0] == "/":
         issueName = issueName[1:]
