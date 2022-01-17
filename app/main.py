@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from flask import Flask, render_template, request
 import requests
 from bs4 import BeautifulSoup as bs
@@ -23,7 +24,7 @@ def comicInfo():
         if "?id=" in url:
             singleIssue = True
         comicTitle = getComicTitle(url, singleIssue)
-        
+
         print(content)
         print(content['url'])
 
@@ -42,7 +43,7 @@ def issueInfo():
         print("STARTURL :   " + url)
         issues = [(getIssueName(issueLink, "/Comic/" + title), "https://readcomiconline.li" + issueLink) for issueLink in issueLinks]
         print(issues)
-        
+
         #TODO: process the issue tuples using JS in comic.html
         return {"title": title, "issues": issues}
 
