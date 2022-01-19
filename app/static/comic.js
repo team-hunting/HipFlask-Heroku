@@ -162,7 +162,7 @@ function createDownloadIssueButton(issueNumber, issueTitle) {
   const br = document.createElement('br');
   let numImages = allImageLinks['links'][issueNumber].length;
   let warning = numImages > 40 ? "- WARNING - LONG" : "";
-  button.innerHTML = `Download ${issueTitle} - ${numImages} images ${warning}`;
+  button.innerHTML = `Download ${issueTitle} : ${numImages} images ${warning}`;
   button.onclick = () => {downloadIssue(issueNumber, issueTitle)}
   document.getElementById("scrapedIssues").appendChild(button);
   document.getElementById("scrapedIssues").appendChild(br);
@@ -180,11 +180,20 @@ function createDownloadIssueWarning() {
     If this is happening to you, try using the switch to 'display images on this page' \
     and then save the entire page once they're done displaying. \
     You will have to pack the images into a zip file manually in this scenario. \
-    If this solution doesn't work for you, feel free to donate so that I can afford a better hosting service."
+    If this solution doesn't work for you, feel free to donate so that I can afford a better hosting service. \
+    If you're both desperate and poor, you can use our python script directly."
 
     document.getElementById("scrapedIssues").appendChild(br);
     br = document.createElement('br');
     document.getElementById("scrapedIssues").appendChild(warning);
+
+    let a = document.createElement('a');
+    a.innerHTML = "Clone it from: https://github.com/team-hunting/ComicDownloader";
+    a.setAttribute('href',"https://github.com/team-hunting/ComicDownloader");
+    
+    document.getElementById("scrapedIssues").appendChild(br);
+    document.getElementById("scrapedIssues").appendChild(a);
+    br = document.createElement('br');
     document.getElementById("scrapedIssues").appendChild(br);
     br = document.createElement('br');
     document.getElementById("scrapedIssues").appendChild(br);
