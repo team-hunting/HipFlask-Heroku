@@ -32,7 +32,7 @@ def comicInfo():
         singleIssue = False
         if "?id=" in url:
             singleIssue = True
-        comicTitle = getComicTitle(url, singleIssue)
+        comicTitle = getComicTitle(url)
         
         print(content)
         print(content['url'])
@@ -42,6 +42,8 @@ def comicInfo():
 @app.route('/api/comic/issueinfo', methods=['POST'])
 def issueInfo():
     content_type = request.headers.get('Content-Type')
+
+    #TODO: Allow this to process single issues
 
     # For testing purposes
     # Comment these lines out to make it actually work
@@ -60,11 +62,28 @@ def issueInfo():
         content = request.get_json()
         print("CONTENT: " + str(content))
         url = content['url']
+
+        issue = False
+        if "?id=" in url:
+            issue = True
+
         title = getComicTitle(url)
-        issueLinks = getLinksFromStartPage(url)
+        print("TITLE: " + title)
+        
+        if issue:
+            issueLinks = [url]
+        else:
+            issueLinks = getLinksFromStartPage(url)
+
+        print("ISSUELINKS: " + str(issueLinks))
         print("STARTURL :   " + url)
-        issues = [(getIssueName(issueLink, "/Comic/" + title), "https://readcomiconline.li" + issueLink) for issueLink in issueLinks]
-        print(issues)
+
+        if issue:
+            issues = [(title, url)]
+        else:
+            issues = [(getIssueName(issueLink, "/Comic/" + title), "https://readcomiconline.li" + issueLink) for issueLink in issueLinks]
+        
+        print("ISSUES: " + str(issues))
         
         return {"title": title, "issues": issues}
 
@@ -86,6 +105,8 @@ def scrapeIssue():
         hq = content['hq']
         print("HQ: " + str(hq))
         print("TYPEOF HQ: ", type(hq))
+
+        print("URL: " + url)
         #uncomment this to make it actually work
         return scrapeImageLinksFromIssue(url, hq)
     
@@ -122,11 +143,9 @@ def downloadIssue():
             print("Something went wrong")
             return {}
 
-
-
     return {}
 
-def getComicTitle(url, issue=False):
+def getComicTitle(url):
     prefix = "https://readcomiconline.li"
     startURL = prefix + "/Comic/"
     title = url.replace(startURL, "", 1)
