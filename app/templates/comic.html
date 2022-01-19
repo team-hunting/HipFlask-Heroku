@@ -77,11 +77,12 @@
 
         <div id="scrapedIssues"></div>
 
+        <br/>
         <div>Please be aware that this script waits 15 seconds in between scraping issues. This is to prevent readcomiconline.li from hitting us with a CAPTCHA.</div>
         <br/>
         
         <button id="getissuebutton">PRESS ME TO GET ISSUES</button> 
-        <button id="printimglinks">LOG ALLIMAGES TO CONSOLE (DEV BUTTON)</button>
+        <!-- <button id="printimglinks">LOG ALLIMAGES TO CONSOLE (DEV BUTTON)</button> -->
         <br/>
 
     </div>
@@ -137,73 +138,72 @@ let allImageLinks = {"links":[]};
 
 issuebutton.addEventListener('click', (e) => {
 
-let displayImagesOnPage = document.getElementById('displayimages').checked;
+  let displayImagesOnPage = document.getElementById('displayimages').checked;
 
-let urlval = urlbox.value == "" ? "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer" : urlbox.value
-let body = {
-  "url": urlval
-};
+  let urlval = urlbox.value == "" ? "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer" : urlbox.value
+  let body = {
+    "url": urlval
+  };
 
-console.log(body)
+  console.log(body)
 
-let requestOptions = {
-    body: JSON.stringify(body),
-    headers: {
-        "Content-Type": "application/json"
-    },
-    method: "POST"
-}
+  let requestOptions = {
+      body: JSON.stringify(body),
+      headers: {
+          "Content-Type": "application/json"
+      },
+      method: "POST"
+  }
 
-fetch(issueUrl, requestOptions).then(
-    function(response) {
-      console.log(response)
-      return response.json();
-}).then(async function(result) {
-    console.log(result)
-    console.log(result['issues'])
-    console.log(result['issues'].length)
-    for (let i = 0; result['issues'].length > i; i++) {
-      issueLink = result['issues'][i][1]
-      issueTitle = result['issues'][i][0]
-      console.log(`Beginning scrape of ${issueTitle} at ${issueLink}`)
-      let info_section = document.createElement('div')
-      info_section.setAttribute('id',`${result['title']}_${i}`);
-      info_section.innerHTML = `Beginning scrape of ${issueTitle} at ${issueLink}`
-      document.getElementById("comicdiv").appendChild(info_section);
-      // Send issuelink to the api
-      await getIssueHtml(issueLink).then(function(response) {
-        console.log(`Response: ${response}`)
-        console.log(response['imageLinks'])
-        let imglinks = response['imageLinks']
-        
-        allImageLinks['links'].push(imglinks)
+  fetch(issueUrl, requestOptions).then(
+      function(response) {
+        console.log(response)
+        return response.json();
+  }).then(async function(result) {
+      console.log(result)
+      console.log(result['issues'])
+      console.log(result['issues'].length)
+      for (let i = 0; result['issues'].length > i; i++) {
+        issueLink = result['issues'][i][1]
+        issueTitle = result['issues'][i][0]
+        console.log(`Beginning scrape of ${issueTitle} at ${issueLink}`)
+        let info_section = document.createElement('div')
+        info_section.setAttribute('id',`${result['title']}_${i}`);
+        info_section.innerHTML = `Beginning scrape of ${issueTitle} at ${issueLink}`
+        document.getElementById("comicdiv").appendChild(info_section);
+        // Send issuelink to the api
+        await getIssueHtml(issueLink).then(function(response) {
+          console.log(`Response: ${response}`)
+          console.log(response['imageLinks'])
+          let imglinks = response['imageLinks']
+          
+          allImageLinks['links'].push(imglinks)
 
-        // Create an "Issue Download" button
-        createDownloadIssueButton(i, issueTitle);
+          // Create an "Issue Download" button
+          createDownloadIssueButton(i, issueTitle);
 
-        // for each image:
-        if (displayImagesOnPage) {
-          for (let i = 0; i < imglinks.length; i++) {
-            displayImage(imglinks[i])
+          // for each image:
+          if (displayImagesOnPage) {
+            for (let i = 0; i < imglinks.length; i++) {
+              displayImage(imglinks[i])
+            }
           }
-        }
-        
-        
-      }) 
+          
+          
+        }) 
 
-      console.log("Sleeping for 15 seconds...");
-      // SLEEP FOR 15 seconds before iterating again
-      await new Promise(r => setTimeout(r, 15000));
-    }
-}).catch(function(err) {
-    console.log(err);
-});
-
-  //console.log("allImageLinks ", allImageLinks)
+        console.log("Sleeping for 15 seconds...");
+        // SLEEP FOR 15 seconds before iterating again
+        await new Promise(r => setTimeout(r, 15000));
+      }
+  }).catch(function(err) {
+      console.log(err);
+  });
 
 })
 
 function displayImage(imageUrl) {
+  // TODO: stick images inside divs that resize based on viewport dimensions
   let image_section = document.createElement('div')
   let image_link = document.createElement('img')
   image_link.src = imageUrl
@@ -237,21 +237,81 @@ async function getIssueHtml(issueLink) {
   return imageLinks
 } 
 
-let showlinksbutton = document.getElementById("printimglinks");
-showlinksbutton.addEventListener('click', (e) => {
-  console.log("allImageLinks ", allImageLinks)
-})
+// let showlinksbutton = document.getElementById("printimglinks");
+// showlinksbutton.addEventListener('click', (e) => {
+//   console.log("allImageLinks ", allImageLinks)
+// })
 
 function createDownloadIssueButton(issueNumber, issueTitle) {
   const button = document.createElement('button');
   const br = document.createElement('br');
-  button.innerHTML = `Download ${issueTitle}`
-  // TODO: change this so it actually downloads the images
-  // I'm thinking, do a fetch to a new endpoint in flask using allImageLinks['links'][issueNumber]
-  // Then, use python to download and zip the images and send the file back to the client for download
-  button.onclick = () => {console.log("Image links in this issue: ", allImageLinks['links'][issueNumber] )}
+  button.innerHTML = `Download ${issueTitle} - May take some time, be patient!`
+  button.onclick = () => {downloadIssue(issueNumber, issueTitle)}
   document.getElementById("scrapedIssues").appendChild(button);
   document.getElementById("scrapedIssues").appendChild(br);
+}
+
+let issueDownloadUrl = "{{ url_for('downloadIssue') }}";
+function downloadIssue(issueNumber, issueTitle) {
+  // get comic title from issue link
+  let links = allImageLinks['links'][issueNumber]; // this is an array of strings
+  let title = getComicTitle();
+  console.log("TITLE: " + title);
+
+  let body = {"links":links,"title":title,"issueTitle":issueTitle}
+
+  let requestOptions = {
+        body: JSON.stringify(body),
+        headers: {
+            "Content-Type": "application/json"
+        },
+        method: "POST"
+    }
+
+    fetch(issueDownloadUrl, requestOptions).then(
+        function(response) {
+          console.log(response);
+          
+          return response.blob();
+
+    }).then(function(response) {
+
+          const newBlob = new Blob([response]);
+          const blobUrl = window.URL.createObjectURL(newBlob);
+
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          let filename = getComicTitle() + "-" + issueTitle + ".cbz"
+          link.setAttribute('download', `${filename}`);
+          document.body.appendChild(link);
+          link.click();
+          link.parentNode.removeChild(link);
+
+          // clean up Url
+          window.URL.revokeObjectURL(blobUrl);
+
+    }).catch(function(err) {
+        console.log(err);
+    });
+
+}
+
+function getComicTitleFromIssueLink(issuelink) {
+  // https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-3?id=37198
+  let title = issuelink.replace("https://readcomiconline.li/Comic/", "");
+  let titleArray = title.split("/");
+  title = titleArray[0];
+  console.log("TITLE DETECTED: " + title);
+  return title;
+}
+
+function getComicTitle() {
+  let title = urlbox.value.replace("https://readcomiconline.li/Comic/", "");
+  if (title.slice(-1) === "/") {
+    return title.slice(0,title.length -1)
+  } else {
+    return title
+  }
 }
 
 </script>

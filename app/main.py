@@ -1,6 +1,8 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory, send_file
 import requests
+import os
 from bs4 import BeautifulSoup as bs
+import shutil
 
 app = Flask(__name__)
 
@@ -42,16 +44,17 @@ def issueInfo():
     content_type = request.headers.get('Content-Type')
 
     # For testing purposes
-    return {"title": "Sandman...Lucifer...Whatever", "issues":[[
-    "Issue-1",
-    "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-1?id=37194"
-],[
-    "Issue-2",
-    "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-2?id=37196"
-],[
-    "Issue-3",
-    "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-3?id=37198"
-] ]}
+    # Comment these lines out to make it actually work
+#     return {"title": "Sandman...Lucifer...Whatever", "issues":[[
+#     "Issue-1",
+#     "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-1?id=37194"
+# ],[
+#     "Issue-2",
+#     "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-2?id=37196"
+# ],[
+#     "Issue-3",
+#     "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-3?id=37198"
+# ] ]}
 
     if content_type == 'application/json':
         content = request.get_json()
@@ -83,10 +86,45 @@ def scrapeIssue():
         hq = content['hq']
         print("HQ: " + str(hq))
         print("TYPEOF HQ: ", type(hq))
-        #return scrapeImageLinksFromIssue(url, hq)
+        #uncomment this to make it actually work
+        return scrapeImageLinksFromIssue(url, hq)
     
     # this only hits if the wrong type of request is sent
+    # Dummy data
     return {"imageLinks":["https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Klaus_Barbie.jpg/176px-Klaus_Barbie.jpg","https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Hoodoo_Mountain.jpg/243px-Hoodoo_Mountain.jpg"]}
+
+@app.route('/api/comic/downloadissue', methods=['POST'])
+def downloadIssue():
+    content_type = request.headers.get('Content-Type')
+
+    if content_type == 'application/json':
+        content = request.get_json()
+        print("CONTENT: " + str(content))
+        imageLinks = content['links']
+        print("IMAGE LINKS: " + str(imageLinks))
+        numImages = len(imageLinks)
+        title = content['title']
+        issueTitle = content['issueTitle']
+        for i in range(len(imageLinks)):
+            link = imageLinks[i]
+            path = saveImageFromUrl(link, numImages, issueTitle, title, i)
+
+        folderCBZPacker(path, title, issueTitle)
+        cbzFile = title + "-" + issueTitle + ".cbz"
+        cbzFilePath = os.getcwd() + os.sep + cbzFile
+
+        try:
+            print("CURRENT DIRECTORY: ", os.getcwd())
+            print("CBZ path: ", cbzFilePath)
+            # TODO: use send_from_directory and have the file saved into the 'static' folder (or a new folder, whatever)
+            return send_file(cbzFilePath, attachment_filename=cbzFile)
+        except:
+            print("Something went wrong")
+            return {}
+
+
+
+    return {}
 
 def getComicTitle(url, issue=False):
     prefix = "https://readcomiconline.li"
@@ -162,3 +200,30 @@ def extractImageUrlFromText(text, hq):
     if hq:
         output = output.replace("s1600","s0")
     return output
+
+def saveImageFromUrl(url, numberOfImages, issueName, title, currentNumber):
+    digits=len(str(numberOfImages))
+
+    path = os.getcwd() + os.sep + title + os.sep + issueName + os.sep
+
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    filename = path + str(currentNumber).rjust(digits,"0") + ".jpg"
+    with open(filename, "wb") as f:
+        f.write(requests.get(url).content)
+
+    # pass the path back for usage with zip
+    return path
+
+def folderCBZPacker(path, comicTitle, issuename):
+    zipName = comicTitle + "-" + issuename
+    try:
+        shutil.make_archive(zipName, 'zip', path)
+    except:
+        print("This zip file already exists")
+
+    try:
+        os.rename(zipName + ".zip", zipName + ".cbz")
+    except:
+        print("This cbz file already exists")
