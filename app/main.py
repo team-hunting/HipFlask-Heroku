@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from flask import Flask, render_template, request, send_from_directory, send_file
 import requests
 import os
@@ -33,7 +34,7 @@ def comicInfo():
         if "?id=" in url:
             singleIssue = True
         comicTitle = getComicTitle(url, singleIssue)
-        
+
         print(content)
         print(content['url'])
 
@@ -65,7 +66,7 @@ def issueInfo():
         print("STARTURL :   " + url)
         issues = [(getIssueName(issueLink, "/Comic/" + title), "https://readcomiconline.li" + issueLink) for issueLink in issueLinks]
         print(issues)
-        
+
         return {"title": title, "issues": issues}
 
     else:
