@@ -8,7 +8,6 @@ Add Loading icons for download buttons in comicsearch (check comic.js for TODOs)
 Set up a database and store image links in it - when a comic is searched we'll first check the database to see if we have previously scraped its image links <br/>
 Rework the file saving and sending in  main.py. Specifically, the downloadIssue() function - we should replace the usage of send_file with send_from_directory for greater security. In order to do this we may need to rework the saveImageFromUrl() function to save images into one of the folders that flask has access to, perhaps 'static'. <br/>
 
-<br/>
 
 ## Info:
 
@@ -27,7 +26,6 @@ If you run the app without development mode on, the WSGI server gives off a warn
 
 On Heroku WEB_CONCURRENCY config variable is set to 3 as per https://devcenter.heroku.com/articles/python-gunicorn <br/>
 
-<br/>
 
 ## Notes:
 
