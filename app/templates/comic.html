@@ -52,7 +52,7 @@
 
         <div class="form-outline">
             <label for="singleissuedisplay">
-                <span class="text-muted">Single Issue Link Provided?</span> 
+                <span class="text-muted">Single Issue Link Provided? Please note that single issue downloading is not supported yet.</span> 
               </label>
 
             <input
@@ -125,7 +125,7 @@ infobutton.addEventListener('click', (e) => {
     }).then(function(result) {
         urldisplay.value = body['url']
         titledisplay.value = result['title']
-        singleissuedisplay.value = result['singleissue'] ? "Yes" : "No"
+        singleissuedisplay.value = result['singleissue'] ? "Yes - This will fail if you try to download. Please provide parent link." : "No"
     }).catch(function(err) {
         console.log(err);
     });
