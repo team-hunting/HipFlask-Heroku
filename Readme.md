@@ -1,15 +1,16 @@
-# HipFlask
+# [HipFlask](https://hip-flask.herokuapp.com/)
 
-This repo automatically deploys to https://hip-flask.herokuapp.com/ <br/> <br/>
+This repo automatically deploys to https://hip-flask.herokuapp.com/ <br/> 
 
 ## TODO:
-Add Navbar (possibly to base.html, possibly as a separate html file entirely which we then { % include .. % } at the top of the document body) <br/>
-Add Loading icons for download buttons in comicsearch (check comic.js for TODOs) <br/>
-Set up a database and store image links in it - when a comic is searched we'll first check the database to see if we have previously scraped its image links <br/>
-Rework the file saving and sending in  main.py. Specifically, the downloadIssue() function - we should replace the usage of send_file with send_from_directory for greater security. In order to do this we may need to rework the saveImageFromUrl() function to save images into one of the folders that flask has access to, perhaps 'static'. <br/>
+- Add Navbar (possibly to base.html, possibly as a separate html file entirely which we then { % include .. % } at the top of the document body) 
+- Add Loading icons for download buttons in comicsearch (check comic.js for TODOs) <br/>
+- Set up a database and store image links in it - when a comic is searched we'll first check the database to see if we have previously scraped its image links
+- Rework the file saving and sending in  main.py. Specifically, the downloadIssue() function - we should replace the usage of send_file with send_from_directory for greater security. In order to do this we may need to rework the saveImageFromUrl() function to save images into one of the folders that flask has access to, perhaps 'static'.
+- Build more cool pages!!!
 
 
-## Info:
+## Dev Info:
 
 To develop Flask apps more effectively, turn on Debug/Development mode. <br/>
 Run the command: ```export FLASK_ENV=development```, then use "flask run" in the same directory as wsgi.py (or just run wsgi.py). Because our entry point is named "wsgi.py" (this is a special name in flask) we don't need to set the FLASK_APP environment variable. "app.py" works as well. <br/>
