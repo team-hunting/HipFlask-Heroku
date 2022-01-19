@@ -5,7 +5,7 @@
 {% block body %}
 
 <div class="min-vw-100 vh-100 d-flex" style="background-color: #eee;">
-    <div class="mx-auto my-auto" style="max-width: 75%; min-width: 75%;" >
+    <div class="mx-auto my-auto" style="max-width: 75%; min-width: 75%;" id="comicdiv" >
     <div>
 
 
@@ -65,7 +65,24 @@
             <label class="form-label" for="singleissuedisplay"></label>
         </div>
 
-        <button id="getissuebutton">PRESS ME TO GET ISSUES</button>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="displayimages">
+          <label class="form-check-label" for="displayimages">Display Images on this page after scraping?</label>
+        </div>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="hqimages">
+          <label class="form-check-label" for="hqimages">Scrape high quality images where available?</label>
+        </div>
+        <br/>
+
+        <div id="scrapedIssues"></div>
+
+        <div>Please be aware that this script waits 15 seconds in between scraping issues. This is to prevent readcomiconline.li from hitting us with a CAPTCHA.</div>
+        <br/>
+        
+        <button id="getissuebutton">PRESS ME TO GET ISSUES</button> 
+        <button id="printimglinks">LOG ALLIMAGES TO CONSOLE (DEV BUTTON)</button>
+        <br/>
 
     </div>
   </div>
@@ -116,10 +133,15 @@ infobutton.addEventListener('click', (e) => {
 let issueUrl = "{{ url_for('issueInfo') }}";
 let issuebutton = document.getElementById("getissuebutton");
 
+let allImageLinks = {"links":[]};
+
 issuebutton.addEventListener('click', (e) => {
 
+let displayImagesOnPage = document.getElementById('displayimages').checked;
+
+let urlval = urlbox.value == "" ? "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer" : urlbox.value
 let body = {
-  "url": urlbox.value == "" ? "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer" : urlbox.value
+  "url": urlval
 };
 
 console.log(body)
@@ -136,27 +158,101 @@ fetch(issueUrl, requestOptions).then(
     function(response) {
       console.log(response)
       return response.json();
-}).then(function(result) {
-    //TODO: 
-    //for issue in result['issues'] 
-    //Add "&readType=1" to issue Link 
-    //If they've ticked an HQ box, add "&quality=hq" as well
-    //display issue[0]  -- Issue Title
-    //display issue[1]  -- Issue Link
-    //display button to begin scraping single issue
-    //display button to begin scraping All
+}).then(async function(result) {
     console.log(result)
+    console.log(result['issues'])
+    console.log(result['issues'].length)
+    for (let i = 0; result['issues'].length > i; i++) {
+      issueLink = result['issues'][i][1]
+      issueTitle = result['issues'][i][0]
+      console.log(`Beginning scrape of ${issueTitle} at ${issueLink}`)
+      let info_section = document.createElement('div')
+      info_section.setAttribute('id',`${result['title']}_${i}`);
+      info_section.innerHTML = `Beginning scrape of ${issueTitle} at ${issueLink}`
+      document.getElementById("comicdiv").appendChild(info_section);
+      // Send issuelink to the api
+      await getIssueHtml(issueLink).then(function(response) {
+        console.log(`Response: ${response}`)
+        console.log(response['imageLinks'])
+        let imglinks = response['imageLinks']
+        
+        allImageLinks['links'].push(imglinks)
+
+        // Create an "Issue Download" button
+        createDownloadIssueButton(i, issueTitle);
+
+        // for each image:
+        if (displayImagesOnPage) {
+          for (let i = 0; i < imglinks.length; i++) {
+            displayImage(imglinks[i])
+          }
+        }
+        
+        
+      }) 
+
+      console.log("Sleeping for 15 seconds...");
+      // SLEEP FOR 15 seconds before iterating again
+      await new Promise(r => setTimeout(r, 15000));
+    }
 }).catch(function(err) {
     console.log(err);
 });
 
+  //console.log("allImageLinks ", allImageLinks)
+
 })
 
-// Scraping button:
-// On click, document.queryselect all elements with issue links stored in them
-// foreach element:
-// fetch to api with URL 
-// When fetch completes, generate that many IMG elements on page send the first link to the API for scraping images
+function displayImage(imageUrl) {
+  let image_section = document.createElement('div')
+  let image_link = document.createElement('img')
+  image_link.src = imageUrl
+  image_section.appendChild(image_link)
+  document.getElementById("comicdiv").appendChild(image_section);
+}
+
+let issueImagesUrl = "{{ url_for('scrapeIssue') }}";
+
+async function getIssueHtml(issueLink) {
+
+  let hqimages = document.getElementById('hqimages').checked;
+
+  let requestOptions = {
+        body: JSON.stringify({"issueLink":issueLink,"hq":hqimages}),
+        headers: {
+            "Content-Type": "application/json"
+        },
+        method: "POST"
+    }
+
+  let imageLinks = await fetch(issueImagesUrl, requestOptions).then(
+        function(response) {
+          //console.log(response)
+            return response.json();
+  }).catch(function(err) {
+      console.log(err);
+  });
+
+  console.log("imagelinks returned ", imageLinks)
+  return imageLinks
+} 
+
+let showlinksbutton = document.getElementById("printimglinks");
+showlinksbutton.addEventListener('click', (e) => {
+  console.log("allImageLinks ", allImageLinks)
+})
+
+function createDownloadIssueButton(issueNumber, issueTitle) {
+  const button = document.createElement('button');
+  const br = document.createElement('br');
+  button.innerHTML = `Download ${issueTitle}`
+  // TODO: change this so it actually downloads the images
+  // I'm thinking, do a fetch to a new endpoint in flask using allImageLinks['links'][issueNumber]
+  // Then, use python to download and zip the images and send the file back to the client for download
+  button.onclick = () => {console.log("Image links in this issue: ", allImageLinks['links'][issueNumber] )}
+  document.getElementById("scrapedIssues").appendChild(button);
+  document.getElementById("scrapedIssues").appendChild(br);
+}
 
 </script>
 
