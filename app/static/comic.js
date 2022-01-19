@@ -160,7 +160,9 @@ async function getIssueHtml(issueLink) {
 function createDownloadIssueButton(issueNumber, issueTitle) {
   const button = document.createElement('button');
   const br = document.createElement('br');
-  button.innerHTML = `Download ${issueTitle}`
+  let numImages = allImageLinks['links'][issueNumber].length;
+  let warning = numImages > 40 ? "- WARNING - LONG" : "";
+  button.innerHTML = `Download ${issueTitle} - ${numImages} images ${warning}`;
   button.onclick = () => {downloadIssue(issueNumber, issueTitle)}
   document.getElementById("scrapedIssues").appendChild(button);
   document.getElementById("scrapedIssues").appendChild(br);
@@ -174,8 +176,9 @@ function createDownloadIssueWarning() {
     "After clicking a download button, be aware that it may take up to a minute \
     before displaying the 'save as' box. Unfortunately, I think Heroku will cause \
     a request to time out if it hasn't responded in 30 seconds. \
-    Extremely long issues may not work for this reason. If this is happening to you, \
-    try using the switch to 'display images on this page' and then save the entire page once they're done displaying. \
+    Extremely long issues, and using the High Quality switch may not work for this reason. \
+    If this is happening to you, try using the switch to 'display images on this page' \
+    and then save the entire page once they're done displaying. \
     You will have to pack the images into a zip file manually in this scenario. \
     If this solution doesn't work for you, feel free to donate so that I can afford a better hosting service."
 
