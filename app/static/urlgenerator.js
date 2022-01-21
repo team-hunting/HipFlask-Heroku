@@ -80,7 +80,10 @@ function runSearch()
   let output_section = document.createElement('div')
   output_section.setAttribute('id','results');
   output_section.setAttribute('class','container center');
-  document.body.appendChild(output_section);
+  output_section.setAttribute('style',"background-color: #eee;");
+
+  let p = document.getElementById("parent");
+  p.appendChild(output_section);
 
   let notice = document.createElement('p');
   notice.setAttribute('class','pcenter');

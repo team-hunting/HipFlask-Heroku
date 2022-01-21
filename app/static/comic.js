@@ -175,11 +175,12 @@ function createDownloadIssueWarning() {
     warning.innerHTML = 
     "After clicking a download button, be aware that it may take up to a minute \
     before displaying the 'save as' box. Unfortunately, I think Heroku will cause \
-    a request to time out if it hasn't responded in 30 seconds. \
-    Extremely long issues, and using the High Quality switch may not work for this reason. \
+    a request to time out if a response isn't provided within 30 seconds. \
+    Extremely long issues or using the High Quality switch may fail for this reason. \
     If this is happening to you, try using the switch to 'display images on this page' \
     and then save the entire page once they're done displaying. \
-    You will have to pack the images into a zip file manually in this scenario. \
+    You will have to pack the images into a zip file manually in this scenario, but at least \
+    there won't be all the extra crap from readcomiconline in the folder. \
     If this solution doesn't work for you, feel free to donate so that I can afford a better hosting service. \
     If you're both desperate and poor, you can use our python script directly."
 

@@ -15,6 +15,7 @@ headers = {
         'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0'
     }
 
+# TODO: Make a home page
 @app.route('/') # Equivalent to: app.add_url_rule('/', '', index)
 def index():
     return render_template('comic.html')
@@ -22,6 +23,10 @@ def index():
 @app.route('/urlsearch')
 def urlsearch():
     return render_template('urlsearch.html')
+
+@app.route('/comicdownload')
+def comic():
+    return render_template('comic.html')
 
 @app.route('/api/comic/comicinfo', methods=['POST'])
 def comicInfo():
@@ -43,8 +48,6 @@ def comicInfo():
 @app.route('/api/comic/issueinfo', methods=['POST'])
 def issueInfo():
     content_type = request.headers.get('Content-Type')
-
-    #TODO: Allow this to process single issues
 
     # For testing purposes
     # Comment these lines out to make it actually work
