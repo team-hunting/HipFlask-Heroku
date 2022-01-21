@@ -163,13 +163,17 @@ function createDownloadIssueButton(issueNumber, issueTitle) {
   let numImages = allImageLinks['links'][issueNumber].length;
   let warning = numImages > 40 ? "- WARNING - LONG" : "";
   button.innerHTML = `Download ${issueTitle} : ${numImages} images ${warning}`;
+  button.setAttribute('class',"btn btn-success");
   button.onclick = () => {downloadIssue(issueNumber, issueTitle)}
   document.getElementById("scrapedIssues").appendChild(button);
   document.getElementById("scrapedIssues").appendChild(br);
 }
 
 function createDownloadIssueWarning() {
-    const warning = document.createElement('h');
+    const div = document.createElement('div');
+    div.setAttribute('class','alert alert-info');
+
+    const warning = document.createElement('p');
     let br = document.createElement('br');
 
     warning.innerHTML = 
@@ -184,20 +188,27 @@ function createDownloadIssueWarning() {
     If this solution doesn't work for you, feel free to donate so that I can afford a better hosting service. \
     If you're both desperate and poor, you can use our python script directly."
 
-    document.getElementById("scrapedIssues").appendChild(br);
-    br = document.createElement('br');
-    document.getElementById("scrapedIssues").appendChild(warning);
+    div.appendChild(warning);
+
+    let hr = document.createElement('hr');
+    div.appendChild(hr);
+
+    let p = document.createElement('p');
+    p.innerHTML = "Clone it here: "
+    p.setAttribute('style',"margin-bottom: 0px");
+
+    div.appendChild(p);
 
     let a = document.createElement('a');
-    a.innerHTML = "Clone it from: https://github.com/team-hunting/ComicDownloader";
+    a.innerHTML = "https://github.com/team-hunting/ComicDownloader";
     a.setAttribute('href',"https://github.com/team-hunting/ComicDownloader");
-    
-    document.getElementById("scrapedIssues").appendChild(br);
-    document.getElementById("scrapedIssues").appendChild(a);
+
+    p.appendChild(a);
+
+    document.getElementById("scrapedIssues").appendChild(div);
+
     br = document.createElement('br');
-    document.getElementById("scrapedIssues").appendChild(br);
-    br = document.createElement('br');
-    document.getElementById("scrapedIssues").appendChild(br);
+    document.getElementById("switches").appendChild(br);
   }
 
 function downloadIssue(issueNumber, issueTitle) {
