@@ -95,8 +95,8 @@
         </div>
         
 
-        <div id="scrapedIssues"></div>
-
+        <div id="scrapedIssues"> </div>
+        
         <br/>
         <div>Please be aware that this script waits 15 seconds in between scraping issues. This is to prevent readcomiconline.li from hitting us with a CAPTCHA.</div>
         <br/>
@@ -106,8 +106,6 @@
           <!-- <button id="printimglinks">LOG ALLIMAGES TO CONSOLE (DEV BUTTON)</button> -->
         </div>
          
-        
-        <br/>
         <br/>
 
     </div>
@@ -116,7 +114,7 @@
 
 
 <script type="text/javascript"> 
-let url = "{{ url_for('comicInfo') }}";
+let infourl = "{{ url_for('comicInfo') }}";
 let issueUrl = "{{ url_for('issueInfo') }}";
 let issueImagesUrl = "{{ url_for('scrapeIssue') }}";
 let issueDownloadUrl = "{{ url_for('downloadIssue') }}";

@@ -4,6 +4,7 @@ let urldisplay = document.getElementById("urldisplay");
 let titledisplay = document.getElementById("titledisplay");
 let singleissuedisplay = document.getElementById("singleissuedisplay");
 
+// INFO BUTTON FUNCTION
 infobutton.addEventListener('click', (e) => {
     let body = "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer";
 
@@ -15,6 +16,8 @@ infobutton.addEventListener('click', (e) => {
       body = {"url": urlbox.value};
     } 
 
+    console.log("BODY: ", body)
+
     let requestOptions = {
         body: JSON.stringify(body),
         headers: {
@@ -23,7 +26,7 @@ infobutton.addEventListener('click', (e) => {
         method: "POST"
     }
 
-    fetch(url, requestOptions).then(
+    fetch(infourl, requestOptions).then(
         function(response) {
             return response.json();
     }).then(function(result) {
@@ -35,11 +38,12 @@ infobutton.addEventListener('click', (e) => {
     });
 })
 
-
 let issuebutton = document.getElementById("getissuebutton");
 
+// Global variable to store all image links
 let allImageLinks = {"links":[]};
 
+// BEGIN SCRAPING BUTTON
 issuebutton.addEventListener('click', (e) => {
 
   let displayImagesOnPage = document.getElementById('displayimages').checked;
@@ -83,6 +87,8 @@ issuebutton.addEventListener('click', (e) => {
         let info_section = document.createElement('div')
         info_section.setAttribute('id',`${result['title']}_${i}`);
         info_section.innerHTML = `Beginning scrape of ${issueTitle} at ${issueLink}`
+        info_section.setAttribute("style", "margin-bottom: 10px");
+
         document.getElementById("comicdiv").appendChild(info_section);
 
         // Send issuelink to the api
@@ -122,9 +128,15 @@ issuebutton.addEventListener('click', (e) => {
 function displayImage(imageUrl) {
   // TODO: stick images inside divs that resize based on viewport dimensions
   let image_section = document.createElement('div')
+  image_section.setAttribute('class',"mx-auto my-auto d-flex justify-content-center");
   let image_link = document.createElement('img')
   image_link.src = imageUrl
+  image_link.setAttribute('style',"margin-bottom: 5px");
   image_section.appendChild(image_link)
+
+  // let br = document.createElement('br')
+  // document.getElementById("comicdiv").appendChild(br);
+
   document.getElementById("comicdiv").appendChild(image_section);
 }
 
@@ -158,12 +170,13 @@ async function getIssueHtml(issueLink) {
 // })
 
 function createDownloadIssueButton(issueNumber, issueTitle) {
-  const button = document.createElement('button');
-  const br = document.createElement('br');
+  let button = document.createElement('button');
+  let br = document.createElement('br');
   let numImages = allImageLinks['links'][issueNumber].length;
   let warning = numImages > 40 ? "- WARNING - LONG" : "";
   button.innerHTML = `Download ${issueTitle} : ${numImages} images ${warning}`;
   button.setAttribute('class',"btn btn-success");
+  button.setAttribute('style',"margin-bottom: 5px");
   button.onclick = () => {downloadIssue(issueNumber, issueTitle)}
   document.getElementById("scrapedIssues").appendChild(button);
   document.getElementById("scrapedIssues").appendChild(br);
@@ -184,9 +197,9 @@ function createDownloadIssueWarning() {
     If this is happening to you, try using the switch to 'display images on this page' \
     and then save the entire page once they're done displaying. \
     You will have to pack the images into a zip file manually in this scenario, but at least \
-    there won't be all the extra crap from readcomiconline in the folder. \
-    If this solution doesn't work for you, feel free to donate so that I can afford a better hosting service. \
-    If you're both desperate and poor, you can use our python script directly."
+    there won't be all the extra crap from readcomiconline in the folder. <hr> \
+    If this solution doesn't work for you, feel free to donate so that I can afford a better hosting service. <br/> \
+    You may also use a more fully-featured python script directly."
 
     div.appendChild(warning);
 

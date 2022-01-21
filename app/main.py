@@ -5,6 +5,9 @@ import os
 from bs4 import BeautifulSoup as bs
 import shutil
 
+# Edit this to turn on dummy data
+app_test = False
+
 app = Flask(__name__)
 
 headers = {
@@ -51,16 +54,17 @@ def issueInfo():
 
     # For testing purposes
     # Comment these lines out to make it actually work
-    return {"title": "Sandman...Lucifer...Whatever", "issues":[[
-    "Issue-1",
-    "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-1?id=37194"
-],[
-    "Issue-2",
-    "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-2?id=37196"
-],[
-    "Issue-3",
-    "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-3?id=37198"
-] ]}
+    if app_test:
+        return {"title": "Sandman...Lucifer...Whatever", "issues":[[
+        "Issue-1",
+        "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-1?id=37194"
+    ],[
+        "Issue-2",
+        "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-2?id=37196"
+    ],[
+        "Issue-3",
+        "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-3?id=37198"
+    ] ]}
 
     if content_type == 'application/json':
         content = request.get_json()
@@ -112,7 +116,8 @@ def scrapeIssue():
 
         print("URL: " + url)
         #uncomment this to make it actually work
-        # return scrapeImageLinksFromIssue(url, hq)
+        if not app_test:
+            return scrapeImageLinksFromIssue(url, hq)
     
     # this only hits if the wrong type of request is sent
     # Dummy data
@@ -156,6 +161,7 @@ def getComicTitle(url):
     if title[-1] == "/":
         title = title[:-1]
 
+    issue = False
     if "?id=" in url:
         issue = True
     if issue:
