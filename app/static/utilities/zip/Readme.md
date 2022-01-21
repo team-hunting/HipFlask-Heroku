@@ -11,10 +11,11 @@ In the HTML:
     <button class="btn btn-lg btn-warning" id="downloadimagesbutton">Download All Images</button>
 </div>
 ```
-<script type="text/javascript" src="{{ url_for('static', filename='utilities/jszip.js')}}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='utilities/jsziputils.js')}}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='utilities/filesaver.js')}}"></script>
-
+```
+<script type="text/javascript" src="{{ url_for('static', filename='utilities/zip/jszip.js')}}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='utilities/zip/jsziputils.js')}}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='utilities/zip/filesaver.js')}}"></script>
+```
 
 In the JS: (Note: CORS may prevent this from working if the img is not on the same domain)
 
