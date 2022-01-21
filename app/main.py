@@ -1,22 +1,12 @@
 #!/usr/bin/env python3
 from flask import Flask, render_template, request, send_from_directory, send_file
-import requests
 import os
-from bs4 import BeautifulSoup as bs
-import shutil
+from .comicscraping import *
 
 # Edit this to turn on dummy data
 app_test = False
 
 app = Flask(__name__)
-
-headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Max-Age': '3600',
-        'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0'
-    }
 
 # TODO: Make a home page
 @app.route('/') # Equivalent to: app.add_url_rule('/', '', index)
@@ -120,8 +110,10 @@ def scrapeIssue():
             return scrapeImageLinksFromIssue(url, hq)
     
     # this only hits if the wrong type of request is sent
-    # Dummy data
-    return {"imageLinks":["https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Klaus_Barbie.jpg/176px-Klaus_Barbie.jpg","https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Hoodoo_Mountain.jpg/243px-Hoodoo_Mountain.jpg"]}
+    # Dummy data from wikipedia
+    # return {"imageLinks":["https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Klaus_Barbie.jpg/176px-Klaus_Barbie.jpg","https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Hoodoo_Mountain.jpg/243px-Hoodoo_Mountain.jpg"]}
+    # Real data for Lucifer (blogspot)
+    return {"imageLinks":['https://2.bp.blogspot.com/QGtDCkEEAplwbN1aD56FLTS3xSKgWh5fanmE9gePQWCB9Tk3uk5tchuli3FeDOFr7WfkC92z_p0=s0', 'https://2.bp.blogspot.com/yjSWP9jjzvV8e-DNKX1U0ftunYprLELUe5X0dIaHOmYK2jTpjCShMTFMbrQwNfMWI_jUrlq4nkQ=s0', 'https://2.bp.blogspot.com/d200xZpFAm85njb7Jaiqz1REK0GfSyc09NHEgSCG0FIrIEipXOv7pADiMKoSDU109Rjj7lELBqs=s0', 'https://2.bp.blogspot.com/cpBljpXugNlmYMpR1V8nkTSdy5iKvgTUBvn5hJdBBAhBCI8t6Bsd06mHBfWdkygdpYP1xCOulLA=s0', 'https://2.bp.blogspot.com/zEpK66FrKHP-5_Lp0bYTgVvac3uEHqZkMmcNkr8a5ifQHPgjHU8QtMLD-LG1xYxwcIqg94Oss_Q=s0', 'https://2.bp.blogspot.com/gJfYll9_oaG2USHNGyJN1Nao785FPpmhBD3b-PYFNI69j_HjJHt8otUTnIU2yrnyZiDb5nUfSxI=s0', 'https://2.bp.blogspot.com/4xcLy7WIZZGPKeKVDR6Y-gpgVnTM3SZqWD8ooRHjgKnkb4uj2M5Afz5FWRo60awWzUw4GV6U8oo=s0', 'https://2.bp.blogspot.com/g9y-8Y0_6dnMv7PIVbWBHq643Wy_gXh4VyMBUFF1eeK9j83ZU9nU1evQBiJf3Lx_mqDyRXLx7Z4=s0', 'https://2.bp.blogspot.com/p2FDlR242bME1Jg2KS8NEln5JkEIin2W2--aZJmfuiLcYrLdX7eWURtvedcLR_09CiUJ0Ua7oPI=s0', 'https://2.bp.blogspot.com/_ic9RAxZHSVpJy1bWbnjNtR_JWuAL16TJzSBlaknRMJl4RZiePOZFcFmHSCte5LxqIlXyGu3rj8=s0', 'https://2.bp.blogspot.com/gefRwe8qKCJTKCZIiGrqF___mbJxNzNW3LkOtE5IvaYJV8g4nZC6fid9kjoGfksGLetxIjdhZ6c=s0', 'https://2.bp.blogspot.com/uBBsFDJlV4RRgQFtOCCDoEerUq8z9vbXOwfY3Np9pAGCwC844k1HpC35u0Ihg__Sy3zV442oS44=s0', 'https://2.bp.blogspot.com/WRHm4mwy87DxA2H5IZnkFL-ScJxlGxBarb9qL6Ug5-S9HAMDkCYm-Y_Ll1LQ4If_vwXza12fif8=s0', 'https://2.bp.blogspot.com/TFH1zAzudxc9ivVcmTs_zfQwiWbxUY_gLO_exqfUCJjPg4W5eUJfiHns8Iy3wGYCNnEJBFQSHNs=s0', 'https://2.bp.blogspot.com/pVB5xhrN6JLPTQZLJi3a3lAgYVIjItQtg8-U_ZAZDr112ek8ORGl-CDVMtfNS9LyH98uuh1_S2s=s0', 'https://2.bp.blogspot.com/d1NYTf30CQS12HtWgoFFFywJvJDowDb83sHkkgDApmgDO2nUDmOcpSRiDBDzt6KQq72nYgiqGJk=s0', 'https://2.bp.blogspot.com/5s-b3pJnwImygJOs1N0mNYDUwu43Ywar_K4qNOOppuq6IXUVlRvtde7lzeBGbUroHwq5PGNRibA=s0', 'https://2.bp.blogspot.com/IdEyrmI94krFY5d33Muxl9I0g7Hz2bn5SDYQtKga1a-zoPjrdWKwWqbutT8XshUyvGAdoREnjzs=s0', 'https://2.bp.blogspot.com/zyJ2WZsteeOxzdLS0fWzHMw4t5PrE8oG2raPl9_zAqle2GYsGra6BwJ2CWjM3V-1G06Vp6V4ki0=s0', 'https://2.bp.blogspot.com/-u51BDju5BFpZAWyq3xnamp6YyEPTOqKK3XlkyfUz3ojCzk89dQVlez9SDlrmIgUaWzSO9pt8Zg=s0', 'https://2.bp.blogspot.com/4aMSa8mRFRioIjYjh90nPyrsGxrli3QcJ62zJh4fQKWpOa_AQf--c3KLMHxkFLHK184mpQs7yDM=s0', 'https://2.bp.blogspot.com/mWIeN7Qd4XDefZIQa-Le5g0CssBmR-YUIL4ZODY-kw_79Je01nHCsDKLv39iUdhyUn8qmuQsH8o=s0', 'https://2.bp.blogspot.com/U89XpO9V8telVAn82dv7HIV-AVHOrYY9HraWqlY-TlaPL5XI1DI5MV_2M4GlAtk5b9tM4zZqWxs=s0', 'https://2.bp.blogspot.com/7omHiWgC76ALRZOzMb9Okl1NkAMV6KbTURPZ3aXkuJolU81O6GgrtYImdih5oDvGmpS8o0Sa0J0=s0']}
 
 @app.route('/api/comic/downloadissue', methods=['POST'])
 def downloadIssue():
@@ -153,106 +145,3 @@ def downloadIssue():
             return {}
 
     return {}
-
-def getComicTitle(url):
-    prefix = "https://readcomiconline.li"
-    startURL = prefix + "/Comic/"
-    title = url.replace(startURL, "", 1)
-    if title[-1] == "/":
-        title = title[:-1]
-
-    issue = False
-    if "?id=" in url:
-        issue = True
-    if issue:
-        # Add the issue number to the title
-        titlePieces =   title.split("/")
-        issueTitle = titlePieces[1].split("?")[0]
-        title = titlePieces[0] + "-" + issueTitle
-
-    return title
-
-def getLinksFromStartPage(url):
-    req = requests.get(url, headers)
-    soup = bs(req.content, 'html.parser')
-
-    links = soup.find_all('a')
-    linkArrayRaw = []
-    for link in links:
-        if link.get('href') != None:
-            linkArrayRaw.append(link.get('href'))
-
-    linkArray = []
-    for link in linkArrayRaw:
-        if link.startswith('/Comic/'):
-            linkArray.append(link)
-
-    linkArray.reverse()
-
-    return linkArray
-
-def getIssueName(issueLink, startURL):
-    # remove the start url, trim the leading /, and everything after the ?
-    issueName = issueLink.replace(startURL, "", 1)[0:].split("?",1)[0]
-    if issueName[0] == "/":
-        issueName = issueName[1:]
-    return issueName
-
-def scrapeImageLinksFromIssue(url, lowres=True):
-    req = requests.get(url, headers)
-    soup = bs(req.content, 'html.parser')
-    soup = soup.prettify()
-    lines = soup.split("\n")
-    imageLinks = []
-
-    print(lines)
-
-    for line in lines:
-        if "https://2.bp.blogspot.com" in line:
-            imageUrl = extractImageUrlFromText(line, lowres)
-            imageLinks.append(imageUrl)
-
-        # if checkForCaptcha(line):
-        #     solveCaptcha(url)
-        #     return scrapeImageLinksFromIssue(url, lowres)
-
-    return {"imageLinks":imageLinks}
-
-def extractImageUrlFromText(text, hq):
-    # urlEnd = text.find("s1600")
-    urlEnd = text.find(")")
-    urlStart = text.find("https")
-    output = text[urlStart:urlEnd-1]
-    print("extracted image link: " + output)
-    # verbose
-    # print("extractImageUrlFromText output ", output)
-    if hq:
-        output = output.replace("s1600","s0")
-    return output
-
-def saveImageFromUrl(url, numberOfImages, issueName, title, currentNumber):
-    digits=len(str(numberOfImages))
-
-    path = os.getcwd() + os.sep + title + os.sep + issueName + os.sep
-
-    if not os.path.exists(path):
-        os.makedirs(path)
-
-    filename = path + str(currentNumber).rjust(digits,"0") + ".jpg"
-    with open(filename, "wb") as f:
-        f.write(requests.get(url).content)
-
-    # pass the path back for usage with zip
-    return path
-
-def folderCBZPacker(path, comicTitle, issuename):
-    zipName = comicTitle + "-" + issuename
-    try:
-        shutil.make_archive(zipName, 'zip', path)
-    except:
-        print("This zip file already exists")
-
-    try:
-        os.rename(zipName + ".zip", zipName + ".cbz")
-    except:
-        print("This cbz file already exists")
