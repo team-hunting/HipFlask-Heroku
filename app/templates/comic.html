@@ -8,11 +8,29 @@
     <div class="mx-auto my-auto" style="max-width: 75%; min-width: 75%;" id="comicdiv" >
     <div>
 
+      <br/>
+        <div class="alert alert-success" role="alert">
+          <h4 class="alert-heading">Instructions</h4>
+          <p>
+            Enter a readcomiconline.li URL in the box. Press "Info" to retrive data about the comic. 
+            You may enter the link for a full series, or the link for a single issue. 
+            Please follow the formats listed under 'Examples'.
+          </p>
 
-        Enter a readcomiconline.li URL in the box. <br/> 
-        Press "Info" to retrive data about the comic. <br/> <br/>
-        Example: <br/> 
-        https://readcomiconline.li/Comic/Sandman-Presents-Lucifer <br/> <br/>
+          <hr>
+          Press "Begin Scraping" to retrieve images.
+
+          <hr>
+
+          <p class="mb-0">
+            Examples: <br/>
+            Series: https://readcomiconline.li/Comic/Sandman-Presents-Lucifer <br/>
+            Single Issue: https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-1?id=37194
+          </p>
+        
+        </div>
+
+
         <div class="input-group mb-3">
             <div class="input-group-prepend">
               <button class="btn btn-outline-secondary" id="infobutton" type="button">Info</button>
@@ -65,24 +83,29 @@
             <label class="form-label" for="singleissuedisplay"></label>
         </div>
 
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" id="displayimages">
-          <label class="form-check-label" for="displayimages">Display Images on this page after scraping?</label>
+        <div id="switches">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="displayimages">
+            <label class="form-check-label" for="displayimages">Display Images on this page after scraping?</label>
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="hqimages">
+            <label class="form-check-label" for="hqimages">Scrape high quality images where available?</label>
+          </div>
         </div>
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" id="hqimages">
-          <label class="form-check-label" for="hqimages">Scrape high quality images where available?</label>
-        </div>
+        
 
-        <div id="scrapedIssues"></div>
-
+        <div id="scrapedIssues"> </div>
+        
         <br/>
         <div>Please be aware that this script waits 15 seconds in between scraping issues. This is to prevent readcomiconline.li from hitting us with a CAPTCHA.</div>
         <br/>
         
-        <button id="getissuebutton">PRESS ME TO GET ISSUES</button> 
-        <!-- <button id="printimglinks">LOG ALLIMAGES TO CONSOLE (DEV BUTTON)</button> -->
-        <br/>
+        <div class="text-center">
+          <button class="btn btn-lg btn-primary" id="getissuebutton">Begin Scraping</button>
+          <!-- <button id="printimglinks">LOG ALLIMAGES TO CONSOLE (DEV BUTTON)</button> -->
+        </div>
+         
         <br/>
 
     </div>
@@ -91,7 +114,7 @@
 
 
 <script type="text/javascript"> 
-let url = "{{ url_for('comicInfo') }}";
+let infourl = "{{ url_for('comicInfo') }}";
 let issueUrl = "{{ url_for('issueInfo') }}";
 let issueImagesUrl = "{{ url_for('scrapeIssue') }}";
 let issueDownloadUrl = "{{ url_for('downloadIssue') }}";
