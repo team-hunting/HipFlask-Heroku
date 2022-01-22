@@ -3,6 +3,17 @@ let urlbox = document.getElementById("comicurl");
 let urldisplay = document.getElementById("urldisplay");
 let titledisplay = document.getElementById("titledisplay");
 let singleissuedisplay = document.getElementById("singleissuedisplay");
+let loadingicon = document.getElementById("loadingicon");
+let displayimagesswitch = document.getElementById('displayimages');
+let imagewidthswitch = document.getElementById('imagewidthdiv');
+
+displayimagesswitch.addEventListener('change', function() {
+  if (displayimagesswitch.checked) {
+    imagewidthswitch.removeAttribute("style");
+  } else {
+    imagewidthswitch.setAttribute("style","display: none");
+  }
+})
 
 // INFO BUTTON FUNCTION
 infobutton.addEventListener('click', (e) => {
@@ -48,7 +59,15 @@ issuebutton.addEventListener('click', (e) => {
 
   let displayImagesOnPage = document.getElementById('displayimages').checked;
 
-  let urlval = urlbox.value == "" ? "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer" : urlbox.value
+  let urlval = urlbox.value;
+
+  if (!urlval.includes("readcomiconline.li")) {
+    alert("Please enter a readcomiconline.li URL in the box.");
+    return;
+  }
+
+  // For testing
+  // urlval = urlbox.value == "" ? "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer" : urlbox.value
   let body = {
     "url": urlval
   };
@@ -67,16 +86,18 @@ issuebutton.addEventListener('click', (e) => {
       function(response) {
         return response.json();
   }).then(async function(result) {
- 
-      console.log("Number of issues: ", result['issues'].length)
+      
+      let numissues = result['issues'].length;
+      console.log("Number of issues: ", numissues)
       console.log("Issues: ", result['issues'])
     
       // Display a warning that issues may take a while to download
       createDownloadIssueWarning()
 
-      for (let i = 0; result['issues'].length > i; i++) {
+      for (let i = 0; numissues > i; i++) {
 
-        //TODO: create a loading icon while we wait for the next scrape to start
+        // Show a loading icon while we wait for the next scrape to start
+        loadingicon.removeAttribute("style");
 
         issueLink = result['issues'][i][1]
         issueTitle = result['issues'][i][0]
@@ -96,10 +117,8 @@ issuebutton.addEventListener('click', (e) => {
 
           let imglinks = response['imageLinks']
           
-          // Global
+          // Global variable to store all image links
           allImageLinks['links'].push(imglinks)
-
-          // TODO: delete loading icon
 
           // Create an "Issue Download" button
           createDownloadIssueButton(i, issueTitle);
@@ -113,10 +132,17 @@ issuebutton.addEventListener('click', (e) => {
           
         }) 
 
-        console.log("Sleeping for 15 seconds...");
+        console.log("i: ", i)
+        console.log("numissues: ", numissues)
 
-        // SLEEP FOR 15 seconds before iterating again
-        await new Promise(r => setTimeout(r, 15000));
+        if (i < numissues - 1) {
+          console.log("Sleeping for 15 seconds...");
+          // SLEEP FOR 15 seconds before iterating again
+          await new Promise(r => setTimeout(r, 15000));
+        }
+
+        // Delete loading icon
+        loadingicon.setAttribute('style',"display: none");
       }
 
   }).catch(function(err) {
@@ -126,16 +152,19 @@ issuebutton.addEventListener('click', (e) => {
 })
 
 function displayImage(imageUrl) {
-  // TODO: stick images inside divs that resize based on viewport dimensions
   let image_section = document.createElement('div')
   image_section.setAttribute('class',"mx-auto my-auto d-flex justify-content-center");
   let image_link = document.createElement('img')
   image_link.src = imageUrl
   image_link.setAttribute('style',"margin-bottom: 5px");
-  image_section.appendChild(image_link)
 
-  // let br = document.createElement('br')
-  // document.getElementById("comicdiv").appendChild(br);
+  let lockimagewidth = document.getElementById('lockimagewidth').checked;
+  console.log("Image width switch: ", lockimagewidth)
+  if (lockimagewidth) {
+    image_link.setAttribute('style',"width: 95%");
+  }
+
+  image_section.appendChild(image_link)
 
   document.getElementById("comicdiv").appendChild(image_section);
 }
