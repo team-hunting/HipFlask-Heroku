@@ -88,6 +88,10 @@
             <input class="form-check-input" type="checkbox" id="displayimages">
             <label class="form-check-label" for="displayimages">Display Images on this page after scraping?</label>
           </div>
+          <div class="form-check form-switch" id="imagewidthdiv" style="display: none">
+            <input class="form-check-input" type="checkbox" id="lockimagewidth">
+            <label class="form-check-label" for="lockimagewidth">Set image widths to screen size?</label>
+          </div>
           <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" id="hqimages">
             <label class="form-check-label" for="hqimages">Scrape high quality images where available?</label>
@@ -96,9 +100,12 @@
         
 
         <div id="scrapedIssues"> </div>
-        
-        <br/>
-        <div>Please be aware that this script waits 15 seconds in between scraping issues. This is to prevent readcomiconline.li from hitting us with a CAPTCHA.</div>
+
+        <div id="loadingicon" class="text-center" style="display: none;">
+          <img src="{{ url_for('static', filename='gears.gif') }}" width="40" height="40">
+        </div>
+
+        <div style="margin-top: 10px;">Please be aware that this script waits 15 seconds in between scraping issues. This is to prevent readcomiconline.li from hitting us with a CAPTCHA.</div>
         <br/>
         
         <div class="text-center">
