@@ -4,6 +4,8 @@ This repo automatically deploys to https://hip-flask.herokuapp.com/ <br/>
 
 ## TODO:
 - Make a homepage 
+- Make a 404 page
+- Catch all unmatched URLs and route to 404
 - Add some Vanta.js because it's cool 
 - Set up a database and store image links in it - when a comic is searched we'll first check the database to see if we have previously scraped its image links
 - Rework the file saving and sending in  main.py. Specifically, the downloadIssue() function - we should replace the usage of send_file with send_from_directory for greater security. In order to do this we may need to rework the saveImageFromUrl() function to save images into one of the folders that flask has access to, perhaps 'static'. Ideally we could replace this with purely client side code, but blogspot has a CORS policy preventing this currently. For more info see static/utilities/Readme.md
