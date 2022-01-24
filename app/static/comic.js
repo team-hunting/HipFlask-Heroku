@@ -112,10 +112,12 @@ issuebutton.addEventListener('click', (e) => {
 
         document.getElementById("comicdiv").appendChild(info_section);
 
+        let fromDb;
         // Send issuelink to the api
         await getIssueHtml(issueLink).then(function(response) {
 
           let imglinks = response['imageLinks']
+          fromDb = response["fromDb"]
           
           // Global variable to store all image links
           allImageLinks['links'].push(imglinks)
@@ -135,7 +137,7 @@ issuebutton.addEventListener('click', (e) => {
         console.log("i: ", i)
         console.log("numissues: ", numissues)
 
-        if (i < numissues - 1) {
+        if ((i < numissues - 1) && !fromDb) {
           console.log("Sleeping for 15 seconds...");
           // SLEEP FOR 15 seconds before iterating again
           await new Promise(r => setTimeout(r, 15000));

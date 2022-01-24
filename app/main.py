@@ -136,20 +136,20 @@ def scrapeIssue():
                 print("Image links found in DB")
                 # Process url strings to add =s0 , =s1600, or nothing
                 processedImageLinks = [processDatabaseImageLink(imageLink, hq) for imageLink in existingimages["imageLinks"]]
-                return {"imageLinks": processedImageLinks}
+                return {"imageLinks": processedImageLinks, "fromDb": True }
 
             imgLinks = scrapeImageLinksFromIssue(url, hq)
             print("Inserting Img Links")
             db.images.insert_one({"url": url.split("&read")[0], "imageLinks": [link.split("=")[0] for link in imgLinks["imageLinks"]]})
 
-            return imgLinks
+            return {"imageLinks": imgLinks["imageLinks"], "fromDb": False}
 
     # this only hits if the wrong type of request is sent
     # Dummy data from wikipedia
     # return {"imageLinks":["https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Klaus_Barbie.jpg/176px-Klaus_Barbie.jpg","https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Hoodoo_Mountain.jpg/243px-Hoodoo_Mountain.jpg"]}
     # Real data for Lucifer (blogspot)
     imgLinks = {"imageLinks":['https://2.bp.blogspot.com/QGtDCkEEAplwbN1aD56FLTS3xSKgWh5fanmE9gePQWCB9Tk3uk5tchuli3FeDOFr7WfkC92z_p0=s0', 'https://2.bp.blogspot.com/yjSWP9jjzvV8e-DNKX1U0ftunYprLELUe5X0dIaHOmYK2jTpjCShMTFMbrQwNfMWI_jUrlq4nkQ=s0', 'https://2.bp.blogspot.com/d200xZpFAm85njb7Jaiqz1REK0GfSyc09NHEgSCG0FIrIEipXOv7pADiMKoSDU109Rjj7lELBqs=s0', 'https://2.bp.blogspot.com/cpBljpXugNlmYMpR1V8nkTSdy5iKvgTUBvn5hJdBBAhBCI8t6Bsd06mHBfWdkygdpYP1xCOulLA=s0', 'https://2.bp.blogspot.com/zEpK66FrKHP-5_Lp0bYTgVvac3uEHqZkMmcNkr8a5ifQHPgjHU8QtMLD-LG1xYxwcIqg94Oss_Q=s0', 'https://2.bp.blogspot.com/gJfYll9_oaG2USHNGyJN1Nao785FPpmhBD3b-PYFNI69j_HjJHt8otUTnIU2yrnyZiDb5nUfSxI=s0', 'https://2.bp.blogspot.com/4xcLy7WIZZGPKeKVDR6Y-gpgVnTM3SZqWD8ooRHjgKnkb4uj2M5Afz5FWRo60awWzUw4GV6U8oo=s0', 'https://2.bp.blogspot.com/g9y-8Y0_6dnMv7PIVbWBHq643Wy_gXh4VyMBUFF1eeK9j83ZU9nU1evQBiJf3Lx_mqDyRXLx7Z4=s0', 'https://2.bp.blogspot.com/p2FDlR242bME1Jg2KS8NEln5JkEIin2W2--aZJmfuiLcYrLdX7eWURtvedcLR_09CiUJ0Ua7oPI=s0', 'https://2.bp.blogspot.com/_ic9RAxZHSVpJy1bWbnjNtR_JWuAL16TJzSBlaknRMJl4RZiePOZFcFmHSCte5LxqIlXyGu3rj8=s0', 'https://2.bp.blogspot.com/gefRwe8qKCJTKCZIiGrqF___mbJxNzNW3LkOtE5IvaYJV8g4nZC6fid9kjoGfksGLetxIjdhZ6c=s0', 'https://2.bp.blogspot.com/uBBsFDJlV4RRgQFtOCCDoEerUq8z9vbXOwfY3Np9pAGCwC844k1HpC35u0Ihg__Sy3zV442oS44=s0', 'https://2.bp.blogspot.com/WRHm4mwy87DxA2H5IZnkFL-ScJxlGxBarb9qL6Ug5-S9HAMDkCYm-Y_Ll1LQ4If_vwXza12fif8=s0', 'https://2.bp.blogspot.com/TFH1zAzudxc9ivVcmTs_zfQwiWbxUY_gLO_exqfUCJjPg4W5eUJfiHns8Iy3wGYCNnEJBFQSHNs=s0', 'https://2.bp.blogspot.com/pVB5xhrN6JLPTQZLJi3a3lAgYVIjItQtg8-U_ZAZDr112ek8ORGl-CDVMtfNS9LyH98uuh1_S2s=s0', 'https://2.bp.blogspot.com/d1NYTf30CQS12HtWgoFFFywJvJDowDb83sHkkgDApmgDO2nUDmOcpSRiDBDzt6KQq72nYgiqGJk=s0', 'https://2.bp.blogspot.com/5s-b3pJnwImygJOs1N0mNYDUwu43Ywar_K4qNOOppuq6IXUVlRvtde7lzeBGbUroHwq5PGNRibA=s0', 'https://2.bp.blogspot.com/IdEyrmI94krFY5d33Muxl9I0g7Hz2bn5SDYQtKga1a-zoPjrdWKwWqbutT8XshUyvGAdoREnjzs=s0', 'https://2.bp.blogspot.com/zyJ2WZsteeOxzdLS0fWzHMw4t5PrE8oG2raPl9_zAqle2GYsGra6BwJ2CWjM3V-1G06Vp6V4ki0=s0', 'https://2.bp.blogspot.com/-u51BDju5BFpZAWyq3xnamp6YyEPTOqKK3XlkyfUz3ojCzk89dQVlez9SDlrmIgUaWzSO9pt8Zg=s0', 'https://2.bp.blogspot.com/4aMSa8mRFRioIjYjh90nPyrsGxrli3QcJ62zJh4fQKWpOa_AQf--c3KLMHxkFLHK184mpQs7yDM=s0', 'https://2.bp.blogspot.com/mWIeN7Qd4XDefZIQa-Le5g0CssBmR-YUIL4ZODY-kw_79Je01nHCsDKLv39iUdhyUn8qmuQsH8o=s0', 'https://2.bp.blogspot.com/U89XpO9V8telVAn82dv7HIV-AVHOrYY9HraWqlY-TlaPL5XI1DI5MV_2M4GlAtk5b9tM4zZqWxs=s0', 'https://2.bp.blogspot.com/7omHiWgC76ALRZOzMb9Okl1NkAMV6KbTURPZ3aXkuJolU81O6GgrtYImdih5oDvGmpS8o0Sa0J0=s0']}
-    return imgLinks
+    return {"imageLinks": imgLinks["imageLinks"], "fromDb": False}
 
 @app.route('/api/comic/downloadissue', methods=['POST'])
 def downloadIssue():
