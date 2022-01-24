@@ -125,4 +125,3 @@ def processDatabaseImageLink(link, hq):
     else:
         link = link + "=s1600"
         return link
-        

@@ -59,39 +59,8 @@ def issueInfo():
 
     # For testing purposes
     if app_test:
-        output = {"title": "Sandman...Lucifer...Whatever", "issues":
-        [
-            [
-        "Issue-1",
-        "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-1?id=37194"
-            ],
-            [
-        "Issue-2",
-        "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-2?id=37196"
-            ],
-            [
-        "Issue-3",
-        "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-3?id=37198"
-            ] 
-        ]}
-
-        outputdb = {
-            "title": "Example-Comic-Title",
-            "issues": [
-                {
-                    "title": "Issue-1", 
-                    "url": "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-1?id=37194"
-                },
-                {
-                    "title": "Issue-2",
-                    "url": "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-2?id=37196"
-                },
-                {
-                    "title": "Issue-3",
-                    "url": "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-3?id=37198"
-                }
-            ]
-        }
+        output = test_output
+        outputdb = test_outputdb
         
         existingissue = db.series.find_one({"title":outputdb["title"]})
 
@@ -111,7 +80,6 @@ def issueInfo():
             issue = True
 
         title = getComicTitle(url)
-        #print("TITLE: " + title)
         
         existingissue = db.series.find_one({"title":title})
 
@@ -127,9 +95,6 @@ def issueInfo():
             issueLinks = [url]
         else:
             issueLinks = getLinksFromStartPage(url)
-
-        #print("ISSUELINKS: " + str(issueLinks))
-        #print("STARTURL :   " + url)
 
         if issue:
             issuesdb = [{"title": title, "url": url}]
@@ -216,3 +181,37 @@ def downloadIssue():
             return {}
 
     return {}
+
+test_output = {"title": "Sandman...Lucifer...Whatever", "issues":
+        [
+            [
+        "Issue-1",
+        "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-1?id=37194"
+            ],
+            [
+        "Issue-2",
+        "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-2?id=37196"
+            ],
+            [
+        "Issue-3",
+        "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-3?id=37198"
+            ] 
+        ]}
+
+test_outputdb = {
+            "title": "Example-Comic-Title",
+            "issues": [
+                {
+                    "title": "Issue-1", 
+                    "url": "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-1?id=37194"
+                },
+                {
+                    "title": "Issue-2",
+                    "url": "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-2?id=37196"
+                },
+                {
+                    "title": "Issue-3",
+                    "url": "https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-3?id=37198"
+                }
+            ]
+        }
