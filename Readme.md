@@ -7,7 +7,6 @@ This repo automatically deploys to https://hip-flask.herokuapp.com/ <br/>
 - Make a 404 page
 - Catch all unmatched URLs and route to 404
 - Add some Vanta.js because it's cool 
-- Set up a database and store image links in it - when a comic is searched we'll first check the database to see if we have previously scraped its image links
 - Rework the file saving and sending in  main.py. Specifically, the downloadIssue() function - we should replace the usage of send_file with send_from_directory for greater security. In order to do this we may need to rework the saveImageFromUrl() function to save images into one of the folders that flask has access to, perhaps 'static'. Ideally we could replace this with purely client side code, but blogspot has a CORS policy preventing this currently. For more info see static/utilities/Readme.md
 - Set up a CORS proxy we can use to snag the blogspot images using fetch, then we can zip them client side
 - Build more cool pages!!!
@@ -30,6 +29,7 @@ If you run the app without development mode on, the WSGI server gives off a warn
 
 On Heroku WEB_CONCURRENCY config variable is set to 3 as per https://devcenter.heroku.com/articles/python-gunicorn <br/>
 
+You will need to set a ```MONGODB_URI``` environment variable to connect to the DB. The value (for this specific deployment) can be found in the heroku settings if you have access. <br/>
 
 ## Notes:
 
