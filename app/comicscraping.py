@@ -56,33 +56,33 @@ def getIssueName(issueLink, startURL):
         issueName = issueName[1:]
     return issueName
 
-def scrapeImageLinksFromIssue(url, lowres=True):
+def scrapeImageLinksFromIssue(url, hq=True):
     req = requests.get(url, headers)
     soup = bs(req.content, 'html.parser')
     soup = soup.prettify()
     lines = soup.split("\n")
     imageLinks = []
-
-    print(lines)
+    # verbose
+    # print(lines)
 
     for line in lines:
         if "https://2.bp.blogspot.com" in line:
-            imageUrl = extractImageUrlFromText(line, lowres)
+            imageUrl = extractImageUrlFromText(line, hq)
             imageLinks.append(imageUrl)
 
         # if checkForCaptcha(line):
         #     solveCaptcha(url)
         #     return scrapeImageLinksFromIssue(url, lowres)
 
-    return {"imageLinks":imageLinks}
+    return { "imageLinks" : imageLinks }
 
 def extractImageUrlFromText(text, hq):
     # urlEnd = text.find("s1600")
     urlEnd = text.find(")")
     urlStart = text.find("https")
     output = text[urlStart:urlEnd-1]
-    print("extracted image link: " + output)
     # verbose
+    # print("extracted image link: " + output)
     # print("extractImageUrlFromText output ", output)
     if hq:
         output = output.replace("s1600","s0")
@@ -114,3 +114,14 @@ def folderCBZPacker(path, comicTitle, issuename):
         os.rename(zipName + ".zip", zipName + ".cbz")
     except:
         print("This cbz file already exists")
+
+def processDatabaseImageLink(link, hq):
+    if link[-4] == ".":
+        return link
+    
+    if hq:
+        link = link + "=s0"
+        return link
+    else:
+        link = link + "=s1600"
+        return link
