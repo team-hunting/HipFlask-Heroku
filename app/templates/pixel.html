@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %} Comic Scraper {% endblock %}
+
+{% block body %}
+
+<div class="min-vw-100 min-vh-100 d-flex" style="background-color: #eee;">
+    <div class="mx-auto my-auto" style="max-width: 90%; min-width: 90%;" id="comicdiv" >
+    <div>
+
+      <br/>
+        <div class="alert alert-success" role="alert">
+          <h4 class="alert-heading">Instructions</h4>
+          <p>
+            Enter a readcomiconline.li URL in the box. Press "Info" to retrive data about the comic. 
+            You may enter the link for a full series, or the link for a single issue. 
+            Please follow the formats listed under 'Examples'.
+          </p>
+
+          <hr>
+          Press "Begin Scraping" to retrieve images.
+
+          <hr>
+
+          <p class="mb-0">
+            Examples: <br/>
+            Series: https://readcomiconline.li/Comic/Sandman-Presents-Lucifer <br/>
+            Single Issue: https://readcomiconline.li/Comic/Sandman-Presents-Lucifer/Issue-1?id=37194
+          </p>
+        
+        </div>
+
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <button class="btn btn-outline-secondary" id="infobutton" type="button">Info</button>
+            </div>
+            <input type="text" id="comicurl" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1">
+        </div>
+        
+        <div class="form-outline">
+            <label for="urldisplay">
+                <span class="text-muted">URL:</span> 
+              </label>
+
+            <input
+              class="form-control"
+              id="urldisplay"
+              type="text"
+              placeholder="https://readcomiconline.li/Comic/Sandman-Presents-Lucifer"
+              aria-label="Comic URL"
+              readonly /> 
+            <label class="form-label" for="urldisplay"></label>
+          </div>
+
+        <div class="form-outline">
+            <label for="titledisplay">
+                <span class="text-muted">Title:</span> 
+              </label>
+
+            <input
+              class="form-control"
+              id="titledisplay"
+              type="text"
+              placeholder="Sandman-Presents-Lucifer"
+              aria-label="Comic Title"
+              readonly /> 
+            <label class="form-label" for="titledisplay"></label>
+          </div>
+
+        <div class="form-outline">
+            <label for="singleissuedisplay">
+                <span class="text-muted">Single Issue Link Provided?</span> 
+              </label>
+
+            <input
+                class="form-control"
+                id="singleissuedisplay"
+                type="text"
+                placeholder="No"
+                aria-label="Comic Single Issue"
+                readonly /> 
+            <label class="form-label" for="singleissuedisplay"></label>
+        </div>
+
+        <div id="switches">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="displayimages">
+            <label class="form-check-label" for="displayimages">Display Images on this page after scraping?</label>
+          </div>
+          <div class="form-check form-switch" id="imagewidthdiv" style="display: none">
+            <input class="form-check-input" type="checkbox" id="lockimagewidth">
+            <label class="form-check-label" for="lockimagewidth">Set image widths to screen size?</label>
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="hqimages">
+            <label class="form-check-label" for="hqimages">Scrape high quality images where available?</label>
+          </div>
+        </div>
+        
+
+        <div id="scrapedIssues"> </div>
+
+        <div id="loadingicon" class="text-center" style="display: none;">
+          <img src="{{ url_for('static', filename='gears.gif') }}" width="40" height="40">
+        </div>
+
+        <div style="margin-top: 10px;">Please be aware that this script waits 15 seconds in between scraping issues from readcomiconline. This is to prevent readcomiconline.li from hitting us with a CAPTCHA. If a cached issue is detected, the wait will be disabled.</div>
+        <br/>
+        
+        <div class="text-center">
+          <button class="btn btn-lg btn-primary" id="getissuebutton">Begin Scraping</button>
+          <!-- <button id="printimglinks">LOG ALLIMAGES TO CONSOLE (DEV BUTTON)</button> -->
+        </div>
+         
+        <br/>
+
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript"> 
+let infourl = "{{ url_for('comicInfo') }}";
+let issueUrl = "{{ url_for('issueInfo') }}";
+let issueImagesUrl = "{{ url_for('scrapeIssue') }}";
+let issueDownloadUrl = "{{ url_for('downloadIssue') }}";
+</script>
+
+
+<script type="text/javascript" src="{{ url_for('static', filename='comic.js')}}"></script>
+
+
+{% endblock %}
