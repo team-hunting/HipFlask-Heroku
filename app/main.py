@@ -6,10 +6,6 @@ from pymongo import MongoClient
 from bson.json_util import ObjectId
 import json
 
-#Pixelsorting
-from PIL import Image
-from pixelsort import pixelsort
-
 # For MongoDB BSON objects
 class MyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -27,17 +23,34 @@ app_test = False
 app = Flask(__name__)
 app.json_encoder = MyEncoder
 
+
+#TODO: Build simple page for pixel allowing user to upload image
+# display said image in an html5 canvas object
+# button to send image to server
+# run pixelsort on image and return it to canvas
+# refactor pixelsorting code to take in arguments from user
+
+#Pixelsorting
+from PIL import Image
+from pixelsort import pixelsort
+from pixelsort.util import id_generator
 @app.route('/pixeltest')
 def pixeltest():
+    image_output_path = id_generator() + ".png"
+
+
     a = Image.open("nails.jpg")
     print(a)
-    pixelsort(a)
+    pixelsort(a).save(image_output_path)
     return {}
     #return render_template('pixel.html')
 
 @app.route('/pixelsort')
 def pixel():
     return render_template('pixel.html')
+
+
+
 
 # TODO: Make a home page
 @app.route('/') # Equivalent to: app.add_url_rule('/', '', index)
