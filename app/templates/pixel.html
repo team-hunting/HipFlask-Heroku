@@ -26,58 +26,16 @@
         
         </div>
 
+        <input type="file" id="inp">
+        <canvas id="canvas"></canvas>
 
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-              <button class="btn btn-outline-secondary" id="infobutton" type="button">Info</button>
-            </div>
-            <input type="text" id="comicurl" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon1">
+
+        <div>
+          <br/>
+          TODO: Add 'Upload Image button: and display it in a canvas element <br/>
+          Add button to send image to 'sortpixelurl' <br/> <br/>
         </div>
         
-        <div class="form-outline">
-            <label for="urldisplay">
-                <span class="text-muted">URL:</span> 
-              </label>
-
-            <input
-              class="form-control"
-              id="urldisplay"
-              type="text"
-              placeholder="https://readcomiconline.li/Comic/Sandman-Presents-Lucifer"
-              aria-label="Comic URL"
-              readonly /> 
-            <label class="form-label" for="urldisplay"></label>
-          </div>
-
-        <div class="form-outline">
-            <label for="titledisplay">
-                <span class="text-muted">Title:</span> 
-              </label>
-
-            <input
-              class="form-control"
-              id="titledisplay"
-              type="text"
-              placeholder="Sandman-Presents-Lucifer"
-              aria-label="Comic Title"
-              readonly /> 
-            <label class="form-label" for="titledisplay"></label>
-          </div>
-
-        <div class="form-outline">
-            <label for="singleissuedisplay">
-                <span class="text-muted">Single Issue Link Provided?</span> 
-              </label>
-
-            <input
-                class="form-control"
-                id="singleissuedisplay"
-                type="text"
-                placeholder="No"
-                aria-label="Comic Single Issue"
-                readonly /> 
-            <label class="form-label" for="singleissuedisplay"></label>
-        </div>
 
         <div id="switches">
           <div class="form-check form-switch">
@@ -94,37 +52,68 @@
           </div>
         </div>
         
-
-        <div id="scrapedIssues"> </div>
-
-        <div id="loadingicon" class="text-center" style="display: none;">
-          <img src="{{ url_for('static', filename='gears.gif') }}" width="40" height="40">
-        </div>
-
-        <div style="margin-top: 10px;">Please be aware that this script waits 15 seconds in between scraping issues from readcomiconline. This is to prevent readcomiconline.li from hitting us with a CAPTCHA. If a cached issue is detected, the wait will be disabled.</div>
-        <br/>
-        
         <div class="text-center">
-          <button class="btn btn-lg btn-primary" id="getissuebutton">Begin Scraping</button>
-          <!-- <button id="printimglinks">LOG ALLIMAGES TO CONSOLE (DEV BUTTON)</button> -->
+          <button class="btn btn-lg btn-primary" id="sort">Sort</button>
         </div>
-         
-        <br/>
 
     </div>
   </div>
 </div>
 
 
+
 <script type="text/javascript"> 
-let infourl = "{{ url_for('comicInfo') }}";
-let issueUrl = "{{ url_for('issueInfo') }}";
-let issueImagesUrl = "{{ url_for('scrapeIssue') }}";
-let issueDownloadUrl = "{{ url_for('downloadIssue') }}";
+
+let sortpixelurl = "{{ url_for('sortpixels') }}";
+
+document.getElementById('inp').onchange = function(e) {
+  let img = new Image();
+  img.onload = draw;
+  img.onerror = failed;
+  img.src = URL.createObjectURL(this.files[0]);
+};
+
+function draw() {
+  let canvas = document.getElementById('canvas');
+  canvas.width = this.width;
+  canvas.height = this.height;
+  let context = canvas.getContext('2d');
+  context.drawImage(this, 0,0);
+};
+
+function failed() {
+  console.error("The provided file couldn't be loaded as an Image media");
+}
+
+let sortbutton = document.getElementById("sort");
+sortbutton.addEventListener("click", async (e) => {
+  let canvas = document.getElementById("canvas")
+  let context = canvas.getContext("2d");
+  let image_data_url = document.querySelector("#canvas").toDataURL('image/jpeg');
+
+  let imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
+  let formData = new FormData();
+  formData.append("image", imageBlob, "image.jpg");
+  let response = await fetch(sortpixelurl, {
+    method: 'POST',
+    body: formData
+  }).then(response => response.blob())
+            .then(blob => {
+
+              let img = new Image();
+              
+              img.onload = (event) => {
+                console.log(event.target.src)
+                URL.revokeObjectURL(event.target.src) // Release the blob to free memory
+                context.drawImage(event.target, 0, 0)
+              }
+
+              img.src = URL.createObjectURL(blob);
+            });
+
+  // console.log(response)
+})
+
 </script>
-
-
-<script type="text/javascript" src="{{ url_for('static', filename='comic.js')}}"></script>
-
 
 {% endblock %}

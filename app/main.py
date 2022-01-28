@@ -5,6 +5,7 @@ from .comicscraping import *
 from pymongo import MongoClient
 from bson.json_util import ObjectId
 import json
+import random
 
 # For MongoDB BSON objects
 class MyEncoder(json.JSONEncoder):
@@ -34,22 +35,27 @@ app.json_encoder = MyEncoder
 from PIL import Image
 from pixelsort import pixelsort
 from pixelsort.util import id_generator
-@app.route('/pixeltest')
-def pixeltest():
-    image_output_path = id_generator() + ".png"
-
-
-    a = Image.open("nails.jpg")
-    print(a)
-    pixelsort(a).save(image_output_path)
-    return {}
-    #return render_template('pixel.html')
 
 @app.route('/pixelsort')
 def pixel():
     return render_template('pixel.html')
 
+@app.route('/api/pixel/sort', methods=['POST'])
+def sortpixels():
+    image_filename = id_generator() + str(random.randint(0,100000)) + ".png"
+    image_path = os.getcwd() + os.sep + image_filename
 
+    print(image_filename)
+    print(image_path)
+
+    file = request.files['image']
+    img = Image.open(file)
+
+    print(img.size) 
+
+    pixelsort(img).save(image_path)
+
+    return send_file(image_path, attachment_filename="test")
 
 
 # TODO: Make a home page
