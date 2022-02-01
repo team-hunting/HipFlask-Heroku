@@ -26,9 +26,6 @@ app.json_encoder = MyEncoder
 
 
 #TODO: Build simple page for pixel allowing user to upload image
-# display said image in an html5 canvas object
-# button to send image to server
-# run pixelsort on image and return it to canvas
 # refactor pixelsorting code to take in arguments from user
 
 #Pixelsorting
@@ -47,6 +44,18 @@ def sortpixels():
 
     print(image_filename)
     print(image_path)
+
+    print()
+    print("PRINTING DATA")
+    print(request.values)
+    # Both work
+    print(request.form['intervalfunction'])
+    print(request.values['intervalfunction'])
+    print()
+
+    # intervalfunction = request.form['intervalfunction']
+    # print(intervalfunction)
+
 
     file = request.files['image']
     img = Image.open(file)

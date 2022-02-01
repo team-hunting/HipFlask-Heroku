@@ -12,7 +12,7 @@
         <div class="alert alert-success" role="alert">
           <h4 class="alert-heading">Instructions</h4>
           <p>
-            Pixel Sorting
+            Pixel Sorting - PAGE IS UNDER DEVELOPMENT
           </p>
 
           <hr>
@@ -26,18 +26,44 @@
         
         </div>
 
-        <input type="file" id="inp">
-        <canvas id="canvas"></canvas>
+        <div id="canvasdiv" style="display: none" class="text-center">
+          <canvas id="canvas"></canvas>
+        </div>
 
+        <div class="text-center">
+          <input type="file" id="inp">
+        </div>
+
+        <br/>
 
         <div>
-          <br/>
-          TODO: Add 'Upload Image button: and display it in a canvas element <br/>
-          Add button to send image to 'sortpixelurl' <br/> <br/>
+
         </div>
         
+        <div>
+          TODO: Add inputs for all the options possible on the Readme Here: https://github.com/TravisHunting/pixelsort
+        <br/> 
+        <br/>
+        </div>
 
         <div id="switches">
+
+          <select class="form-select" aria-label="Default select example" id="intervalselector">
+            <option selected>Select Interval Function:</option>
+            <option value="1">threshold</option>
+            <option value="2">edges</option>
+            <option value="3">waves</option>
+            <option value="3">file</option>
+            <option value="3">file-edges</option>
+            <option value="3">random</option>
+            <option value="3">none</option>
+          </select>
+
+          <div id="intervaldescription">
+          </div>
+
+          <br/>
+
           <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" id="displayimages">
             <label class="form-check-label" for="displayimages">Display Images on this page after scraping?</label>
@@ -50,10 +76,13 @@
             <input class="form-check-input" type="checkbox" id="hqimages">
             <label class="form-check-label" for="hqimages">Scrape high quality images where available?</label>
           </div>
+
         </div>
         
+        <br/>
+
         <div class="text-center">
-          <button class="btn btn-lg btn-primary" id="sort">Sort</button>
+          <button class="btn btn-lg btn-primary" id="sort">Sort Pixels</button>
         </div>
 
     </div>
@@ -66,7 +95,40 @@
 
 let sortpixelurl = "{{ url_for('sortpixels') }}";
 
+let canvasdiv = document.getElementById("canvasdiv");
+let intervalselector = document.getElementById("intervalselector");
+let intervaldescription = document.getElementById("intervaldescription");
+
+intervalselector.onchange = function(e) {
+  let selectedFunc = intervalselector.options[intervalselector.selectedIndex].text;
+  console.log(selectedFunc)
+  switch (selectedFunc) {
+    case "threshold":
+      intervaldescription.innerHTML = "Intervals defined by lightness thresholds; only pixels with a lightness between the upper and lower thresholds are sorted.";
+      break;
+    case "edges":
+      intervaldescription.innerHTML = "Performs an edge detection, which is used to define intervals. Tweak threshold with threshold.";
+      break;
+    case "waves":
+      intervaldescription.innerHTML = "Intervals are waves of nearly uniform widths. Control width of waves with clength.";
+      break;
+    case "file":
+      intervaldescription.innerHTML = "Intervals taken from another specified input image. Must be black and white, and the same size as the input image.";
+      break;
+    case "file-edges":
+      intervaldescription.innerHTML = "Intevals defined by performing edge detection on the file specified by -f. Must be the same size as the input image.";
+      break;
+    case "random":
+      intervaldescription.innerHTML = "Randomly generate intervals. Distribution of widths is linear by default. Interval widths can be scaled using clength.";
+      break;
+    case "none":
+      intervaldescription.innerHTML = "Sort whole rows, only stopping at image borders.";
+      break;
+  }
+};
+
 document.getElementById('inp').onchange = function(e) {
+  canvasdiv.removeAttribute("style");
   let img = new Image();
   img.onload = draw;
   img.onerror = failed;
@@ -92,8 +154,13 @@ sortbutton.addEventListener("click", async (e) => {
   let image_data_url = document.querySelector("#canvas").toDataURL('image/jpeg');
 
   let imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
+  
   let formData = new FormData();
   formData.append("image", imageBlob, "image.jpg");
+  let selectedFunc = intervalselector.options[intervalselector.selectedIndex].text;
+  formData.append("intervalfunction", selectedFunc)
+  formData.append("test", "testing")
+
   let response = await fetch(sortpixelurl, {
     method: 'POST',
     body: formData
