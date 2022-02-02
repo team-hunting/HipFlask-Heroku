@@ -5,6 +5,7 @@ from .comicscraping import *
 from pymongo import MongoClient
 from bson.json_util import ObjectId
 import json
+import random
 
 # For MongoDB BSON objects
 class MyEncoder(json.JSONEncoder):
@@ -22,6 +23,54 @@ app_test = False
 
 app = Flask(__name__)
 app.json_encoder = MyEncoder
+
+
+#TODO: Build simple page for pixel allowing user to upload image
+# refactor pixelsorting code to take in arguments from user
+
+#Pixelsorting
+from PIL import Image
+from pixelsort import pixelsort
+from pixelsort.util import id_generator
+
+@app.route('/pixelsort')
+def pixel():
+    return render_template('pixel.html')
+
+@app.route('/api/pixel/sort', methods=['POST'])
+def sortpixels():
+    image_filename = id_generator() + str(random.randint(0,100000)) + ".png"
+    image_path = os.getcwd() + os.sep + image_filename
+
+    print(image_filename)
+    print(image_path)
+
+    print()
+    print("PRINTING DATA")
+    print(request.values)
+    # Both work
+    print(request.form['intervalfunction'])
+    print(request.values['intervalfunction'])
+    print()
+
+    # intervalfunction = request.form['intervalfunction']
+    # print(intervalfunction)
+
+
+    file = request.files['image']
+    # print("FILENAME: ", request.files['image'].filename)
+    if request.files['image'].filename == "":
+        print("No file detected")
+        return send_from_directory('static', "default.jpg")
+
+    img = Image.open(file)
+
+    print(img.size) 
+
+    pixelsort(img).save(image_path)
+
+    return send_file(image_path, attachment_filename="sorted.png")
+
 
 # TODO: Make a home page
 @app.route('/') # Equivalent to: app.add_url_rule('/', '', index)

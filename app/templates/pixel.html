@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %} Pixel Sorter {% endblock %}
+
+{% block body %}
+
+<div class="min-vw-100 min-vh-100 d-flex" style="background-color: #eee;">
+    <div class="mx-auto my-auto" style="max-width: 90%; min-width: 90%;" id="comicdiv" >
+    <div>
+
+      <br/>
+        <div class="alert alert-success" role="alert">
+          <h4 class="alert-heading">Instructions</h4>
+          <p>
+            Pixel Sorting - PAGE IS UNDER DEVELOPMENT
+          </p>
+
+          <hr>
+          Upload an image, select parameters, click "SORT"
+
+          <hr>
+
+          <p class="mb-0">
+            Examples: ...
+          </p>
+        
+        </div>
+
+        <div id="canvasdiv" style="display: none" class="text-center">
+          <canvas id="canvas"></canvas>
+        </div>
+
+        <div class="text-center">
+          <input type="file" id="inp">
+        </div>
+
+        <br/>
+
+        <div>
+
+        </div>
+        
+        <div>
+          TODO: Add inputs for all the options possible on the Readme Here: https://github.com/TravisHunting/pixelsort
+        <br/> 
+        <br/>
+        </div>
+
+        <div id="switches">
+
+          <select class="form-select" aria-label="Default select example" id="intervalselector">
+            <option selected>Select Interval Function:</option>
+            <option value="1">threshold</option>
+            <option value="2">edges</option>
+            <option value="3">waves</option>
+            <option value="4">file</option>
+            <option value="5">file-edges</option>
+            <option value="6">random</option>
+            <option value="7">none</option>
+          </select>
+
+          <div id="intervaldescription">
+          </div>
+
+          <br/>
+
+          <div class="input-group mb-3">
+            <span class="input-group-text" id="randomspan">Randomness (0-100)</span>
+            <input type="text" id="randomness" class="form-control" placeholder="What percentage of intervals NOT to sort. 0 by default." aria-label="Username" aria-describedby="basic-addon1">
+          </div>
+
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="displayimages">
+            <label class="form-check-label" for="displayimages">Display Images on this page after scraping?</label>
+          </div>
+          <div class="form-check form-switch" id="imagewidthdiv" style="display: none">
+            <input class="form-check-input" type="checkbox" id="lockimagewidth">
+            <label class="form-check-label" for="lockimagewidth">Set image widths to screen size?</label>
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="hqimages">
+            <label class="form-check-label" for="hqimages">Scrape high quality images where available?</label>
+          </div>
+
+        </div>
+        
+        <br/>
+
+        <div class="text-center">
+          <button class="btn btn-lg btn-primary" id="sort">Sort Pixels</button>
+        </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<script type="text/javascript"> 
+
+let sortpixelurl = "{{ url_for('sortpixels') }}";
+
+let canvasdiv = document.getElementById("canvasdiv");
+let intervalselector = document.getElementById("intervalselector");
+let intervaldescription = document.getElementById("intervaldescription");
+
+let intervalFunctionTypes = {
+  "threshold":"Intervals defined by lightness thresholds; only pixels with a lightness between the upper and lower thresholds are sorted.",
+  "edges":"Performs an edge detection, which is used to define intervals. Tweak threshold with threshold.",
+  "waves":"Intervals are waves of nearly uniform widths. Control width of waves with clength.",
+  "file":"Intervals taken from another specified input image. Must be black and white, and the same size as the input image.",
+  "file-edges":"Intervals defined by performing edge detection on the file specified by -f. Must be the same size as the input image.",
+  "random":"Randomly generate intervals. Distribution of widths is linear by default. Interval widths can be scaled using clength.",
+  "none":"Sort whole rows, only stopping at image borders."
+} 
+
+intervalselector.onchange = function(e) {
+  let selectedFunc = intervalselector.options[intervalselector.selectedIndex].text;
+  //console.log(selectedFunc)
+  if (selectedFunc in intervalFunctionTypes) {
+    intervaldescription.innerHTML = intervalFunctionTypes[selectedFunc];
+  } else {
+    intervaldescription.innerHTML = "";
+    canvasdiv.setAttribute("style","display: none")
+  }
+};
+
+let imageFileName = "";
+
+document.getElementById('inp').onchange = function(e) {
+  imageFileName = e.target.files[0].name;
+  console.log(imageFileName);
+
+  canvasdiv.removeAttribute("style");
+  let img = new Image();
+  img.onload = draw;
+  img.onerror = failed;
+  img.src = URL.createObjectURL(this.files[0]);
+};
+
+function draw() {
+  let canvas = document.getElementById('canvas');
+  canvas.width = this.width;
+  canvas.height = this.height;
+  let context = canvas.getContext('2d');
+  context.drawImage(this, 0,0);
+};
+
+function failed() {
+  console.error("The provided file couldn't be loaded as an Image media");
+}
+
+let sortbutton = document.getElementById("sort");
+
+sortbutton.addEventListener("click", async (e) => {
+  let canvas = document.getElementById("canvas")
+  let context = canvas.getContext("2d");
+  // let image_data_url = document.querySelector("#canvas").toDataURL('image/jpeg');
+
+  let imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
+  
+  let formData = new FormData();
+  formData.append("image", imageBlob, imageFileName);
+
+  let selectedFunc = intervalselector.options[intervalselector.selectedIndex].text;
+  if (!(selectedFunc in intervalFunctionTypes)) {
+    console.log("No interval function selected, defaulting to threshold.")
+    selectedFunc = "threshold";
+  }
+  formData.append("intervalfunction", selectedFunc)
+
+  let randomness = parseInt(document.getElementById("randomness").value, 10);
+  // console.log(randomness)
+  // console.log("Type of Randomness input: ", typeof randomness);
+  if (isNaN(randomness) || randomness < 0) {
+    console.log("Randomness didn't parse, or was below zero. Setting to 0.")
+    randomness = 0;
+  }
+  if (randomness > 100) {
+    console.log("Randomness cannot be greater than 100, setting to 100.")
+    randomness = 100
+  }
+
+  formData.append("randomness", randomness)
+
+  //formData.append("test", "testing")
+
+  let response = await fetch(sortpixelurl, {
+    method: 'POST',
+    body: formData
+  }).then(response => response.blob())
+            .then(blob => {
+
+              let img = new Image();
+              
+              img.onload = (event) => {
+                console.log(event.target.src)
+                URL.revokeObjectURL(event.target.src) // Release the blob to free memory
+                context.drawImage(event.target, 0, 0)
+                canvasdiv.removeAttribute("style");
+              }
+
+              img.src = URL.createObjectURL(blob);
+            });
+
+  // console.log(response)
+})
+
+</script>
+
+{% endblock %}
