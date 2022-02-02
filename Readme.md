@@ -2,10 +2,22 @@
 
 This repo automatically deploys to https://hip-flask.herokuapp.com/ <br/> 
 
-## TODO:
+## PIXEL SORTING TODO:
+- Build UI elements for:
+- Randomness
+- Threshold lower and Threshold upper
+- Char.length
+- Angle
+- External interval file + upload box
+- Sorting function
+- Mask
+- Modify pixel sorting module to take these arguments (currently takes from cmd line)
+- Get a better default image in the static folder
+- Update canvas size in case of default image
+
+## GENERAL TODO:
 - Make a homepage 
 - Make a 404 page
-- Build a pixel sorting algorith with tweakable parameters, and a new page that allows the user to upload an image and then perform pixel sorting on it.
 - Catch all unmatched URLs and route to 404
 - Add some Vanta.js because it's cool 
 - Rework the file saving and sending in  main.py. Specifically, the downloadIssue() function - we should replace the usage of send_file with send_from_directory for greater security. In order to do this we may need to rework the saveImageFromUrl() function to save images into one of the folders that flask has access to, perhaps 'static'. Ideally we could replace this with purely client side code, but blogspot has a CORS policy preventing this currently. For more info see static/utilities/Readme.md

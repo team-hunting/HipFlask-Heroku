@@ -58,13 +58,18 @@ def sortpixels():
 
 
     file = request.files['image']
+    # print("FILENAME: ", request.files['image'].filename)
+    if request.files['image'].filename == "":
+        print("No file detected")
+        return send_from_directory('static', "default.jpg")
+
     img = Image.open(file)
 
     print(img.size) 
 
     pixelsort(img).save(image_path)
 
-    return send_file(image_path, attachment_filename="test")
+    return send_file(image_path, attachment_filename="sorted.png")
 
 
 # TODO: Make a home page

@@ -64,6 +64,11 @@
 
           <br/>
 
+          <div class="input-group mb-3">
+            <span class="input-group-text" id="randomspan">Randomness (0-100)</span>
+            <input type="text" id="randomness" class="form-control" placeholder="What percentage of intervals NOT to sort. 0 by default." aria-label="Username" aria-describedby="basic-addon1">
+          </div>
+
           <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" id="displayimages">
             <label class="form-check-label" for="displayimages">Display Images on this page after scraping?</label>
@@ -104,7 +109,7 @@ let intervalFunctionTypes = {
   "edges":"Performs an edge detection, which is used to define intervals. Tweak threshold with threshold.",
   "waves":"Intervals are waves of nearly uniform widths. Control width of waves with clength.",
   "file":"Intervals taken from another specified input image. Must be black and white, and the same size as the input image.",
-  "file-edges":"Intevals defined by performing edge detection on the file specified by -f. Must be the same size as the input image.",
+  "file-edges":"Intervals defined by performing edge detection on the file specified by -f. Must be the same size as the input image.",
   "random":"Randomly generate intervals. Distribution of widths is linear by default. Interval widths can be scaled using clength.",
   "none":"Sort whole rows, only stopping at image borders."
 } 
@@ -120,7 +125,12 @@ intervalselector.onchange = function(e) {
   }
 };
 
+let imageFileName = "";
+
 document.getElementById('inp').onchange = function(e) {
+  imageFileName = e.target.files[0].name;
+  console.log(imageFileName);
+
   canvasdiv.removeAttribute("style");
   let img = new Image();
   img.onload = draw;
@@ -141,21 +151,38 @@ function failed() {
 }
 
 let sortbutton = document.getElementById("sort");
+
 sortbutton.addEventListener("click", async (e) => {
   let canvas = document.getElementById("canvas")
   let context = canvas.getContext("2d");
-  let image_data_url = document.querySelector("#canvas").toDataURL('image/jpeg');
+  // let image_data_url = document.querySelector("#canvas").toDataURL('image/jpeg');
 
   let imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
   
   let formData = new FormData();
-  formData.append("image", imageBlob, "image.jpg");
+  formData.append("image", imageBlob, imageFileName);
+
   let selectedFunc = intervalselector.options[intervalselector.selectedIndex].text;
   if (!(selectedFunc in intervalFunctionTypes)) {
     console.log("No interval function selected, defaulting to threshold.")
     selectedFunc = "threshold";
   }
   formData.append("intervalfunction", selectedFunc)
+
+  let randomness = parseInt(document.getElementById("randomness").value, 10);
+  // console.log(randomness)
+  // console.log("Type of Randomness input: ", typeof randomness);
+  if (isNaN(randomness) || randomness < 0) {
+    console.log("Randomness didn't parse, or was below zero. Setting to 0.")
+    randomness = 0;
+  }
+  if (randomness > 100) {
+    console.log("Randomness cannot be greater than 100, setting to 100.")
+    randomness = 100
+  }
+
+  formData.append("randomness", randomness)
+
   //formData.append("test", "testing")
 
   let response = await fetch(sortpixelurl, {
@@ -170,6 +197,7 @@ sortbutton.addEventListener("click", async (e) => {
                 console.log(event.target.src)
                 URL.revokeObjectURL(event.target.src) // Release the blob to free memory
                 context.drawImage(event.target, 0, 0)
+                canvasdiv.removeAttribute("style");
               }
 
               img.src = URL.createObjectURL(blob);
