@@ -18,11 +18,11 @@
           <hr>
           Upload an image, select parameters, click "SORT"
 
-          <hr>
+          <!-- <hr>
 
           <p class="mb-0">
             Examples: ...
-          </p>
+          </p> -->
         
         </div>
 
@@ -44,6 +44,7 @@
         <div id="rotatediv" style="display: none" class="text-center">
           <button type="button" id="rotatebutton" class="btn btn-success">Rotate Image</button>
         </div>
+        <br/>
         
         <div id="shrinkwarning" style="display: none">
           <div class="alert alert-warning" role="alert">
@@ -166,13 +167,8 @@ rotatebutton.addEventListener("click", (e) => {
   context.drawImage(img,0,0);
   context.setTransform(1,0,0,1,0,0);
 
-  console.log("IMG: ", img)
-  console.log("TYPEOF IMG: ", typeof img)
+  // Remember the new orientation
   img.src = canvas.toDataURL("image/png");
-  // img = canvas.toDataURL("image/png");
-  // img = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-  console.log("IMG: ", img)
-  console.log("TYPEOF IMG: ", typeof img)
 })
 
 
@@ -210,13 +206,11 @@ function draw() {
     totalpx = width * height;
   }
 
-
   canvas.width = width;
   canvas.height = height;
 
   let context = canvas.getContext('2d');
   context.drawImage(this, 0, 0, width, height);
-
 };
 
 function failed() {
@@ -228,7 +222,6 @@ let sortbutton = document.getElementById("sort");
 sortbutton.addEventListener("click", async (e) => {
   let canvas = document.getElementById("canvas")
   let context = canvas.getContext("2d");
-  // let image_data_url = document.querySelector("#canvas").toDataURL('image/jpeg');
 
   let imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
   
@@ -242,23 +235,11 @@ sortbutton.addEventListener("click", async (e) => {
   }
   formData.append("intervalfunction", selectedFunc)
 
-  // let randomness = parseInt(document.getElementById("randomness").value, 10);
   let randomness = document.getElementById("randomness")
   randomness = parseInputPercent(randomness, 0)
   console.log("Randomness: ", randomness)
-  // console.log("Type of Randomness input: ", typeof randomness);
-  // if (isNaN(randomness) || randomness < 0) {
-  //   console.log("Randomness didn't parse, or was below zero. Setting to 0.")
-  //   randomness = 0;
-  // }
-  // if (randomness > 100) {
-  //   console.log("Randomness cannot be greater than 100, setting to 100.")
-  //   randomness = 100
-  // }
-
   formData.append("randomness", randomness)
 
-  // let thresholdlower = parseInt(document.getElementById("thresholdlower").value, 10);
   let thresholdlower = document.getElementById("thresholdlower").value;
   thresholdlower = parseInputPercent(thresholdlower, 25);
   console.log("thresholdlower: ", thresholdlower)
@@ -269,27 +250,25 @@ sortbutton.addEventListener("click", async (e) => {
   console.log("thresholdupper: ", thresholdupper)
   formData.append("thresholdupper", thresholdupper);
 
-  //formData.append("test", "testing")
-
   let response = await fetch(sortpixelurl, {
     method: 'POST',
     body: formData
   }).then(response => response.blob())
             .then(blob => {
 
-              let img = new Image();
+              let image = new Image();
               
-              img.onload = (event) => {
+              image.onload = (event) => {
                 console.log(event.target.src)
                 URL.revokeObjectURL(event.target.src) // Release the blob to free memory
                 context.drawImage(event.target, 0, 0)
                 canvasdiv.removeAttribute("style");
               }
 
-              img.src = URL.createObjectURL(blob);
+              image.src = URL.createObjectURL(blob);
+              // Remember the sorting when rotating
+              img.src = image.src;
             });
-
-  // console.log(response)
 })
 
 function parseInputPercent(inputval, defaultval) {
