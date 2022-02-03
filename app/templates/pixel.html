@@ -41,10 +41,14 @@
 
         </div>
         
-        <div>
-          TODO: Add inputs for all the options possible on the Readme Here: https://github.com/TravisHunting/pixelsort
-        <br/> 
-        <br/>
+        <div id="shrinkwarning" style="display: none">
+          <div class="alert alert-warning" role="alert">
+            This app is running on a free Heroku account. Unfortunately that means there isn't much processing power
+            allotted on the server, and that requests time out after 30s. To get around this, your image is resized (shrunk to 250k pixels)
+            before being sent to the server. If you want to go absolutely buck wild, please check out the python source code @ 
+            <a href="https://github.com/TravisHunting/pixelsort">https://github.com/TravisHunting/pixelsort</a> <br/>
+            Special thanks to @satyarth and of course the famous @kimasendorf (github)
+          </div>
         </div>
 
         <div id="switches">
@@ -139,6 +143,8 @@ document.getElementById('inp').onchange = function(e) {
   console.log(imageFileName);
 
   canvasdiv.removeAttribute("style");
+  shrinkwarning.removeAttribute("style");
+
   let img = new Image();
   img.onload = draw;
   img.onerror = failed;
@@ -147,12 +153,29 @@ document.getElementById('inp').onchange = function(e) {
 
 function draw() {
   let canvas = document.getElementById('canvas');
-  canvas.width = this.width;
-  canvas.height = this.height;
+  
+  // Previous method - Too large
+  // canvas.width = this.width;
+  // canvas.height = this.height;
+  // let context = canvas.getContext('2d');
+  // context.drawImage(this, 0, 0);
+
+  let width = this.width;
+  let height = this.height;
+  let totalpx = width * height;
+
+  // Shrink image to 250k pixels or less, retain aspect ratio
+  while (totalpx > 250000) {
+    width = width * 0.9;
+    height = height * 0.9;
+    totalpx = width * height;
+  }
+
+  canvas.width = width;
+  canvas.height = height;
   let context = canvas.getContext('2d');
+  context.drawImage(this, 0, 0, width, height);
 
-
-  context.drawImage(this, 0,0);
 };
 
 function failed() {

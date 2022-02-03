@@ -10,7 +10,8 @@ This repo automatically deploys to https://hip-flask.herokuapp.com/ <br/>
 - Sorting function
 - Mask
 - 
-- Add a filesize checker - or dynamically resize images
+- Hide 'options' sections initially and reveal them in an accordian, or with a button or something
+- Dynamically resize images
 - Add a "Rotate img 90 degrees" button
 - Get a better default image in the static folder
 - Update canvas size in case of default image
