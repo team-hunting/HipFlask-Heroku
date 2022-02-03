@@ -26,8 +26,9 @@
         
         </div>
 
+        <!-- <div id="canvasdiv" style="display: none" class="text-center mx-auto my-auto d-flex"> -->
         <div id="canvasdiv" style="display: none" class="text-center">
-          <canvas id="canvas"></canvas>
+          <canvas id="canvas" style="width: 100%"></canvas>
         </div>
 
         <div class="text-center">
@@ -149,6 +150,8 @@ function draw() {
   canvas.width = this.width;
   canvas.height = this.height;
   let context = canvas.getContext('2d');
+
+
   context.drawImage(this, 0,0);
 };
 
