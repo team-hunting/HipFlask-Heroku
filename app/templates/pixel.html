@@ -154,6 +154,7 @@ rotatebutton.addEventListener("click", (e) => {
   let newwidth = height; // after rotation
   let newheight = width; // after rotation
   let scale = newwidth / img.height; // how much to scale the image to fit
+  console.log("SCALE: ", scale)
   canvas.width = newwidth;
   canvas.height = newheight;
   context.setTransform(
@@ -164,6 +165,14 @@ rotatebutton.addEventListener("click", (e) => {
   );
   context.drawImage(img,0,0);
   context.setTransform(1,0,0,1,0,0);
+
+  console.log("IMG: ", img)
+  console.log("TYPEOF IMG: ", typeof img)
+  img.src = canvas.toDataURL("image/png");
+  // img = canvas.toDataURL("image/png");
+  // img = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+  console.log("IMG: ", img)
+  console.log("TYPEOF IMG: ", typeof img)
 })
 
 
@@ -201,8 +210,10 @@ function draw() {
     totalpx = width * height;
   }
 
+
   canvas.width = width;
   canvas.height = height;
+
   let context = canvas.getContext('2d');
   context.drawImage(this, 0, 0, width, height);
 
