@@ -11,11 +11,10 @@ This repo automatically deploys to https://hip-flask.herokuapp.com/ <br/>
 - Mask
 - 
 - Hide 'options' sections initially and reveal them in an accordian, or with a button or something
-- Dynamically resize images
 - Add a "Rotate img 90 degrees" button
 - Get a better default image in the static folder
 - Update canvas size in case of default image
-- Add ability to revert to original image(?)
+- Add ability to revert to original image(?) Use context.save() and context.restore()
 - Add async method to delete the sorted image from server after it gets served back to client
 
 ## GENERAL TODO:

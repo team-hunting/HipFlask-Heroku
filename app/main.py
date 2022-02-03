@@ -88,7 +88,7 @@ def sortpixels():
 # TODO: Make a home page
 @app.route('/') # Equivalent to: app.add_url_rule('/', '', index)
 def index():
-    return render_template('comic.html')
+    return render_template('pixel.html')
 
 @app.route('/urlsearch')
 def urlsearch():
