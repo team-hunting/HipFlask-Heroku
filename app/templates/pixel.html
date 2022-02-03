@@ -64,23 +64,29 @@
 
           <br/>
 
-          <div class="input-group mb-3">
+          <div class="input-group" style="margin-bottom: 1px">
             <span class="input-group-text" id="randomspan">Randomness (0-100)</span>
-            <input type="text" id="randomness" class="form-control" placeholder="What percentage of intervals NOT to sort. 0 by default." aria-label="Username" aria-describedby="basic-addon1">
+            <input type="text" id="randomness" class="form-control" placeholder="0" aria-label="Username" aria-describedby="basic-addon1">
           </div>
+          What percentage of intervals NOT to sort. Default 0.
 
-          <div class="form-check form-switch">
+          <div class="input-group" style="margin-bottom: 1px; margin-top: 7px">
+            <span class="input-group-text" >Threshold lower (0-100)</span>
+            <input type="text" id="thresholdlower" class="form-control" placeholder="25" aria-label="Username" aria-describedby="basic-addon1">
+          </div>
+          How dark must a pixel be to be considered as a 'border' for sorting? Default 25. Used in edges and threshold modes.
+
+          <div class="input-group" style="margin-bottom: 1px; margin-top: 7px">
+            <span class="input-group-text" >Threshold upper (0-100)</span>
+            <input type="text" id="thresholdupper" class="form-control" placeholder="80" aria-label="Username" aria-describedby="basic-addon1">
+          </div>
+          How bright must a pixel be to be considered as a 'border' for sorting? Default 80. Used in threshold mode.
+
+          <!-- <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" id="displayimages">
             <label class="form-check-label" for="displayimages">Display Images on this page after scraping?</label>
-          </div>
-          <div class="form-check form-switch" id="imagewidthdiv" style="display: none">
-            <input class="form-check-input" type="checkbox" id="lockimagewidth">
-            <label class="form-check-label" for="lockimagewidth">Set image widths to screen size?</label>
-          </div>
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" id="hqimages">
-            <label class="form-check-label" for="hqimages">Scrape high quality images where available?</label>
-          </div>
+          </div> -->
+
 
         </div>
         
@@ -169,19 +175,32 @@ sortbutton.addEventListener("click", async (e) => {
   }
   formData.append("intervalfunction", selectedFunc)
 
-  let randomness = parseInt(document.getElementById("randomness").value, 10);
-  // console.log(randomness)
+  // let randomness = parseInt(document.getElementById("randomness").value, 10);
+  let randomness = document.getElementById("randomness")
+  randomness = parseInputPercent(randomness, 0)
+  console.log("Randomness: ", randomness)
   // console.log("Type of Randomness input: ", typeof randomness);
-  if (isNaN(randomness) || randomness < 0) {
-    console.log("Randomness didn't parse, or was below zero. Setting to 0.")
-    randomness = 0;
-  }
-  if (randomness > 100) {
-    console.log("Randomness cannot be greater than 100, setting to 100.")
-    randomness = 100
-  }
+  // if (isNaN(randomness) || randomness < 0) {
+  //   console.log("Randomness didn't parse, or was below zero. Setting to 0.")
+  //   randomness = 0;
+  // }
+  // if (randomness > 100) {
+  //   console.log("Randomness cannot be greater than 100, setting to 100.")
+  //   randomness = 100
+  // }
 
   formData.append("randomness", randomness)
+
+  // let thresholdlower = parseInt(document.getElementById("thresholdlower").value, 10);
+  let thresholdlower = document.getElementById("thresholdlower").value;
+  thresholdlower = parseInputPercent(thresholdlower, 25);
+  console.log("thresholdlower: ", thresholdlower)
+  formData.append("thresholdlower", thresholdlower);
+
+  let thresholdupper = document.getElementById("thresholdupper").value;
+  thresholdupper = parseInputPercent(thresholdupper, 80);
+  console.log("thresholdupper: ", thresholdupper)
+  formData.append("thresholdupper", thresholdupper);
 
   //formData.append("test", "testing")
 
@@ -205,6 +224,21 @@ sortbutton.addEventListener("click", async (e) => {
 
   // console.log(response)
 })
+
+function parseInputPercent(inputval, defaultval) {
+  inputval = parseInt(inputval, 10);
+
+  if (isNaN(inputval) || inputval < 0) {
+    console.log("inputval didn't parse, or was below zero. Setting to default.")
+    inputval = defaultval;
+  }
+  if (randomness > 100) {
+    console.log("inputval cannot be greater than 100, setting to default.")
+    inputval = defaultval;
+  }
+
+  return inputval
+}
 
 </script>
 

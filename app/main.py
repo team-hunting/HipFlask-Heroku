@@ -63,11 +63,24 @@ def sortpixels():
         print("No file detected")
         return send_from_directory('static', "default.jpg")
 
+    interval_function = request.values['intervalfunction']
+    lower_threshold = int(request.values['thresholdlower']) / 100
+    upper_threshold = int(request.values['thresholdupper']) / 100
+
+    print("INTERVAL FUNCTION: ", interval_function)
+    print("lower_threshold: ", lower_threshold)
+    print("upper_threshold: ", upper_threshold)
+    print("TYPE OF lower_threshold: ", type(lower_threshold))
+
     img = Image.open(file)
 
     print(img.size) 
 
-    pixelsort(img).save(image_path)
+    pixelsort(img, 
+         interval_function=interval_function,
+        lower_threshold=lower_threshold,
+        upper_threshold=upper_threshold
+        ).save(image_path)
 
     return send_file(image_path, attachment_filename="sorted.png")
 

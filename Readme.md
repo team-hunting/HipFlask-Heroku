@@ -4,16 +4,16 @@ This repo automatically deploys to https://hip-flask.herokuapp.com/ <br/>
 
 ## PIXEL SORTING TODO:
 - Build UI elements for:
-- Randomness
-- Threshold lower and Threshold upper
 - Char.length
 - Angle
 - External interval file + upload box
 - Sorting function
 - Mask
-- Modify pixel sorting module to take these arguments (currently takes from cmd line)
+- 
 - Get a better default image in the static folder
 - Update canvas size in case of default image
+- Add ability to revert to original image(?)
+- Add async method to delete the sorted image from server after it gets served back to client
 
 ## GENERAL TODO:
 - Make a homepage 
