@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block title %} ASCII Gen {% endblock %}
+
+{% block body %}
+
+<div class="min-vw-100 min-vh-100 d-flex" style="background-color: #eee;">
+    <div class="mx-auto my-auto" style="max-width: 90%; min-width: 90%;" id="comicdiv" >
+    <div>
+
+      <br/>
+        <div class="alert alert-success" role="alert">
+          <h4 class="alert-heading">Instructions</h4>
+          <p>
+            ASCII Gen - PAGE IS UNDER DEVELOPMENT
+          </p>
+
+          <hr>
+          Upload an image, select parameters, click "SORT"
+
+          <!-- <hr>
+
+          <p class="mb-0">
+            Examples: ...
+          </p> -->
+        
+        </div>
+
+        <div id="canvasdiv" style="display: none" class="text-center">
+          <!-- <div style="z-index: 5; position: relative" id="loadingicon">
+            <img src="{{ url_for('static', filename='gears.gif') }}" width="40" height="40">
+          </div> -->
+          
+          <canvas id="canvas" style="max-width: 100%; max-height: 50%;"></canvas>
+        </div>
+
+        <div class="text-center">
+          <input type="file" id="inp">
+        </div>
+
+        <br/>
+
+        <div>
+
+        </div>
+
+        <div id="rotatediv" style="display: none" class="text-center">
+          <button type="button" id="rotatebutton" class="btn btn-success">Rotate Image</button>
+        </div>
+        <br/>
+        
+        <div id="shrinkwarning" style="display: none">
+          <div class="alert alert-warning" role="alert">
+            This app is running on a free Heroku account. Unfortunately that means there isn't much processing power
+            allotted on the server, and that requests time out after 30s. To get around this, your image is resized (shrunk to a certain number of total pixels)
+            before being sent to the server. If you want to go absolutely buck wild, please check out the python source code @ 
+            <a href="https://github.com/TravisHunting/pixelsort">https://github.com/TravisHunting/pixelsort</a> <br/>
+            Special thanks to @satyarth and of course the famous @kimasendorf (github)
+          </div>
+        </div>
+
+        <div id="switches">
+
+          <div class="input-group" style="margin-bottom: 1px">
+            <span class="input-group-text" id="randomspan">Threshold (0-100)</span>
+            <input type="text" id="threshold" class="form-control" placeholder="0" aria-label="Username" aria-describedby="basic-addon1">
+          </div>
+          Determines the cut-off point for pixels that turn black/white.
+
+        </div>
+        
+        <br/>
+
+        <div class="text-center">
+          <button class="btn btn-lg btn-primary" id="generateThreshold">Generate Greyscale Image</button>
+        </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<script type="text/javascript"> 
+
+let thresholdUrl = "{{ url_for('threshold') }}";
+
+let canvasdiv = document.getElementById("canvasdiv");
+let intervalselector = document.getElementById("intervalselector");
+let intervaldescription = document.getElementById("intervaldescription");
+
+let imageFileName = "";
+
+let img = new Image();
+
+let rotatebutton = document.getElementById("rotatebutton");
+rotatebutton.addEventListener("click", (e) => {
+  let canvas = document.getElementById('canvas');
+  let context = canvas.getContext('2d');
+  let width = canvas.width;
+  let height = canvas.height;
+
+  let newwidth = height; // after rotation
+  let newheight = width; // after rotation
+  let scale = newwidth / img.height; // how much to scale the image to fit
+  console.log("SCALE: ", scale)
+  canvas.width = newwidth;
+  canvas.height = newheight;
+  context.setTransform(
+      0,scale, // x axis down the screen
+      -scale,0, // y axis across the screen from right to left
+      newwidth,    // x origin is on the right side of the canvas 
+      0         // y origin is at the top
+  );
+  context.drawImage(img,0,0);
+  context.setTransform(1,0,0,1,0,0);
+
+  // Remember the new orientation
+  img.src = canvas.toDataURL("image/png");
+})
+
+
+document.getElementById('inp').onchange = function(e) {
+  imageFileName = e.target.files[0].name;
+  console.log(imageFileName);
+
+  canvasdiv.removeAttribute("style");
+  shrinkwarning.removeAttribute("style");
+  rotatediv.removeAttribute("style");
+
+  // let img = new Image();
+  img.onload = draw;
+  img.onerror = failed;
+  img.src = URL.createObjectURL(this.files[0]);
+};
+
+function draw() {
+  let canvas = document.getElementById('canvas');
+  
+  // Previous method - Too large
+  // canvas.width = this.width;
+  // canvas.height = this.height;
+  // let context = canvas.getContext('2d');
+  // context.drawImage(this, 0, 0);
+
+  let width = this.width;
+  let height = this.height;
+  let totalpx = width * height;
+
+  // Shrink image to 250k pixels or less, retain aspect ratio
+  // while (totalpx > 500000) {
+  //   width = width * 0.9;
+  //   height = height * 0.9;
+  //   totalpx = width * height;
+  // }
+
+  canvas.width = width;
+  canvas.height = height;
+
+  let context = canvas.getContext('2d');
+  context.drawImage(this, 0, 0, width, height);
+};
+
+function failed() {
+  console.error("The provided file couldn't be loaded as an Image media");
+}
+
+let generateThresholdButton = document.getElementById("generateThreshold");
+
+generateThresholdButton.addEventListener("click", async (e) => {
+  let canvas = document.getElementById("canvas")
+  let context = canvas.getContext("2d");
+
+  let imageBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg'));
+  
+  let formData = new FormData();
+  formData.append("image", imageBlob, imageFileName);
+
+  let threshold = document.getElementById("threshold").value
+  threshold = parseInputPercent(threshold, 0)
+  console.log("threshold: ", threshold)
+
+  formData.append("threshold", threshold)
+
+  let response = await fetch(thresholdUrl, {
+    method: 'POST',
+    body: formData
+  }).then(response => response.blob())
+            .then(blob => {
+
+              let image = new Image();
+              
+              image.onload = (event) => {
+                console.log(event.target.src)
+                URL.revokeObjectURL(event.target.src) // Release the blob to free memory
+                context.drawImage(event.target, 0, 0)
+                canvasdiv.removeAttribute("style");
+              }
+
+              image.src = URL.createObjectURL(blob);
+              // Remember the sorting when rotating
+              img.src = image.src;
+            });
+})
+
+function parseInputPercent(inputval, defaultval) {
+  inputval = parseInt(inputval, 10);
+
+  if (isNaN(inputval) || inputval < 0) {
+    console.log("inputval didn't parse, or was below zero. Setting to default.")
+    inputval = defaultval;
+  }
+
+  return inputval
+}
+
+</script>
+
+{% endblock %}
