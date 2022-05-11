@@ -6,6 +6,13 @@ from pymongo import MongoClient
 from bson.json_util import ObjectId
 import json
 import random
+#Pixelsorting
+from PIL import Image
+from pixelsort import pixelsort
+from pixelsort.util import id_generator
+# ASCII
+import cv2
+import numpy
 
 # For MongoDB BSON objects
 class MyEncoder(json.JSONEncoder):
@@ -25,13 +32,48 @@ app = Flask(__name__)
 app.json_encoder = MyEncoder
 
 
+@app.route('/ascii')
+def ascii():
+    return render_template('ascii.html')
+
+@app.route('/api/ascii/threshold', methods=['POST'])
+def threshold():
+    image_filename = id_generator() + str(random.randint(0,100000)) + ".png"
+    image_path = os.getcwd() + os.sep + image_filename
+
+    print("Image filename", image_filename)
+    print("Image path", image_path)
+
+    print()
+    print("PRINTING DATA")
+    print(request.values)
+    print(request.values['threshold'])
+
+    file = request.files['image']
+    # print("FILENAME: ", request.files['image'].filename)
+    if request.files['image'].filename == "":
+        print("No file detected")
+        return send_from_directory('static', "default.jpg")
+
+    file = file.read()
+    npimg = numpy.fromstring(file, numpy.uint8)
+    grayImage = cv2.imdecode(npimg, 0)
+    cv2.imwrite(image_path, grayImage)
+    return send_file(image_path, attachment_filename="thresh.png")
+
+
+    (thresh, blackAndWhiteImage) = cv2.threshold(grayImage, 127, 255, cv2.THRESH_BINARY)
+    # Save Image
+    cv2.imwrite(image_path, blackAndWhiteImage)
+
+    # print("worked so far, attempting to print image size")
+    # print(originalImage.size) 
+
+    # return {}
+    return send_file(image_path, attachment_filename="sorted.png")
+
 #TODO: Build simple page for pixel allowing user to upload image
 # refactor pixelsorting code to take in arguments from user
-
-#Pixelsorting
-from PIL import Image
-from pixelsort import pixelsort
-from pixelsort.util import id_generator
 
 @app.route('/pixelsort')
 def pixel():

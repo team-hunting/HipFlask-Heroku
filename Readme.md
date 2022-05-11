@@ -54,7 +54,9 @@ If you run the app without development mode on, the WSGI server gives off a warn
 
 On Heroku WEB_CONCURRENCY config variable is set to 3 as per https://devcenter.heroku.com/articles/python-gunicorn <br/>
 
-You will need to set a ```MONGODB_URI``` environment variable to connect to the DB. The value (for this specific deployment) can be found in the heroku settings if you have access. <br/>
+You will need to set a ```MONGODB_URI``` environment variable to connect to the DB. The value (for this specific deployment) can be found in the heroku settings (or github secrets) if you have access. <br/>
+
+```set MONGODB_URI="mongodb+srv://heroku:<...>@<...>.<...>.mongodb.net/<...>"``` <br/>
 
 ## Notes:
 
