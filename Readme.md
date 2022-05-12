@@ -75,3 +75,11 @@ Flask quickstart: https://flask.palletsprojects.com/en/2.0.x/quickstart/ <br/>
 Bootstrap components: https://getbootstrap.com/docs/5.0/customize/components/ <br/> 
 
 Client Side zip & download functionality is contained under static/utilities/zip <br/>
+
+## Heroku Notes
+
+To get opencv to work with Heroku follow these steps: <br/>
+-Add this buildpack: https://github.com/heroku/heroku-buildpack-apt.git
+-Create an Aptfile (just like Procfile, no extension)
+-Add these to Aptfile, one per line: libsm6 libxrender1 libfontconfig1 libice6
+-Change requirements.txt to use opencv-python-headless instead of opencv-python
