@@ -7,4 +7,4 @@ pytest-shutil==1.7.0
 pymongo==4.0.1
 dnspython==2.2.0
 Pillow==9.0.1
-opencv-python==4.5.5.64
+opencv-python-headless==4.5.5.64
