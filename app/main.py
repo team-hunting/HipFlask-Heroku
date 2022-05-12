@@ -48,6 +48,7 @@ def threshold():
     print("PRINTING DATA")
     print(request.values)
     print(request.values['threshold'])
+    threshold = int(request.values['threshold'])
 
     file = request.files['image']
     # print("FILENAME: ", request.files['image'].filename)
@@ -58,11 +59,12 @@ def threshold():
     file = file.read()
     npimg = numpy.fromstring(file, numpy.uint8)
     grayImage = cv2.imdecode(npimg, 0)
-    cv2.imwrite(image_path, grayImage)
-    return send_file(image_path, attachment_filename="thresh.png")
+    # cv2.imwrite(image_path, grayImage)
+    # return send_file(image_path, attachment_filename="thresh.png")
 
 
-    (thresh, blackAndWhiteImage) = cv2.threshold(grayImage, 127, 255, cv2.THRESH_BINARY)
+    # (thresh, blackAndWhiteImage) = cv2.threshold(grayImage, 127, 255, cv2.THRESH_BINARY)
+    (thresh, blackAndWhiteImage) = cv2.threshold(grayImage, threshold, 255, cv2.THRESH_BINARY)
     # Save Image
     cv2.imwrite(image_path, blackAndWhiteImage)
 
