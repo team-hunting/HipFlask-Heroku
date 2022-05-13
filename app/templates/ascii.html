@@ -58,7 +58,15 @@
         <br/>
 
         <div class="text-center">
-          <button class="btn btn-lg btn-primary" id="generateThreshold">Generate Greyscale Image</button>
+          <button class="btn btn-lg btn-primary" id="generateThresholdButton">Generate Black and White Image</button>
+        </div>
+        <br/>
+
+        <div class="text-center">
+          <button class="btn btn-lg btn-primary" id="generateAscii">Generate ASCII</button>
+        </div>
+
+        <div id="filedisplay">
         </div>
 
     </div>
@@ -79,6 +87,148 @@ let img = new Image();
 let imgRestore = new Image();
 let imgRestoreWidth = 0;
 let imgRestoreHeight = 0;
+
+generateAscii.addEventListener("click", (e) => {
+  let canvas = document.getElementById('canvas');
+  let context = canvas.getContext('2d');
+  let imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+  console.log(imageData);
+  let colorGrid = [];
+  for (let i = 0; i < canvas.width; i++) {
+    colorGrid.push([]);
+  }
+  console.log(colorGrid)
+
+  let colorIndices;
+  let blackIndex;
+  let blackForCoord;
+  // colorIndices = getColorIndicesForCoord(0, 0, imageData.width);
+  // blackIndex = colorIndices[3];
+  // blackForCoord = imageData.data[blackIndex];
+
+  for (let i = 0; i < canvas.width; i++) {
+    for (let j = 0; j < canvas.height; j++) {
+      colorIndices = getColorIndicesForCoord(i, j, imageData.width);
+      blackIndex = colorIndices[2];
+      blackForCoord = imageData.data[blackIndex];
+      colorGrid[i].push(blackForCoord);
+    }
+  }
+
+  console.log(colorGrid)
+
+  let length = colorGrid.length;
+  let height = colorGrid[0].length;
+
+  let characterGrid = [];
+  for (let i = 0; i < length; i++) {
+    characterGrid.push([]);
+  }
+
+  let brailleMap = new Map();
+  brailleMap.set("1,1,1,1","⡇")
+  
+  brailleMap.set("0,1,1,1","⡆")
+  brailleMap.set("1,1,1,0","⠇")
+  brailleMap.set("1,1,0,1","⡃")
+  brailleMap.set("1,0,1,1","⡅")
+
+  brailleMap.set("0,0,1,1","⡄")
+  brailleMap.set("0,1,0,1","⡂")
+  brailleMap.set("1,0,0,1","⡁")
+  brailleMap.set("1,0,1,0","⢨") // wrong
+  brailleMap.set("0,1,1,0","⠰")
+  brailleMap.set("1,1,0,0","⠃")
+
+  brailleMap.set("0,0,0,1","⡀")
+  brailleMap.set("1,0,0,0","⠁")
+  brailleMap.set("0,1,0,0","⠂")
+  brailleMap.set("0,0,1,0","⠄")
+
+  brailleMap.set("0,0,0,0","⠀")
+  
+
+  console.log(brailleMap.get("0,0,0,0"))
+  console.log("⡇")
+
+  let points = [0,0,0,0];
+  for (let i = 0; i < length; i++) {
+    for (let j = 0; j < height - 3; j = j + 4) {
+      points = [0,0,0,0];
+      if (colorGrid[i][j] != 0) {
+        points[0] = 1
+      }
+      if (colorGrid[i][j+1] != 0) {
+        points[1] = 1
+      }
+      if (colorGrid[i][j+2] != 0) {
+        points[2] = 1
+      }
+      if (colorGrid[i][j+3] != 0) {
+        points[3] = 1
+      }
+      // console.log(points)
+      characterGrid[i].push(brailleMap.get(points.toString()))
+      }
+    }
+
+  
+  console.log(characterGrid);
+
+  // Push character grid to text box
+  let p = document.createElement("p");
+  p.innerHTML = characterGrid;
+  document.getElementById("filedisplay").appendChild(p);
+
+  // let characterGrid = [];
+  // for (let i = 0; i < length/2; i++) {
+  //   characterGrid.push([]);
+  // }
+
+  // let brailleMap = new Map();
+  // brailleMap.set([1,1,1,1,1,1,1,1],"⣿")
+  // brailleMap.set([0,1,1,1,1,1,1,1],"⣾")
+  // brailleMap.set([1,0,1,1,1,1,1,1],"⣽")
+  // brailleMap.set([0,0,1,1,1,1,1,1],"⣼")
+
+
+  // let points = [0,0,0,0,0,0,0,0];
+  // for (let i = 0; i < length - 1; i = i + 2) {
+  //   for (let j = 0; j < height - 3; j = j + 4) {
+  //     if (colorGrid[i][j] != 0) {
+  //       points[0] = 1
+  //     }
+  //     if (colorGrid[i][j+1] != 0) {
+  //       points[1] = 1
+  //     }
+  //     if (colorGrid[i][j+2] != 0) {
+  //       points[2] = 1
+  //     }
+  //     if (colorGrid[i][j+3] != 0) {
+  //       points[3] = 1
+  //     }
+  //     if (colorGrid[i+1][j] != 0) {
+  //       points[4] = 1
+  //     }
+  //     if (colorGrid[i+1][j+1] != 0) {
+  //       points[5] = 1
+  //     }
+  //     if (colorGrid[i+1][j+2] != 0) {
+  //       points[6] = 1
+  //     }
+  //     if (colorGrid[i+1][j+3] != 0) {
+  //       points[7] = 1
+  //     }
+  //   }
+  // }
+
+})
+
+function getColorIndicesForCoord(x, y, width) {
+  var red = y * (width * 4) + x * 4;
+  return [red, red + 1, red + 2, red + 3];
+}
 
 restorebutton.addEventListener("click", (e) => {
   let canvas = document.getElementById('canvas');
@@ -119,7 +269,6 @@ rotatebutton.addEventListener("click", (e) => {
   img.src = canvas.toDataURL("image/png");
 })
 
-
 document.getElementById('inp').onchange = function(e) {
   imageFileName = e.target.files[0].name;
   console.log(imageFileName);
@@ -152,6 +301,17 @@ function draw() {
   //   totalpx = width * height;
   // }
 
+  // To generate the ASCII art we need the height of the image to be perfectly divisible by 4
+  let aspectRatio = width / height;
+  while (height % 4 != 0) {
+    height--;
+    width = height * aspectRatio;
+  }
+
+  if (width % 2 != 0) {
+    width--;
+  }
+
   canvas.width = width;
   canvas.height = height;
 
@@ -162,8 +322,6 @@ function draw() {
 function failed() {
   console.error("The provided file couldn't be loaded as an Image media");
 }
-
-let generateThresholdButton = document.getElementById("generateThreshold");
 
 generateThresholdButton.addEventListener("click", async (e) => {
   let canvas = document.getElementById("canvas")
