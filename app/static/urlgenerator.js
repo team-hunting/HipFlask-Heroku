@@ -34,7 +34,7 @@ function generateUrlArray(search_term,category) {
       case "textbooks":
       return [
         "http://libgen.rs/search.php?req="+search_term+"&open=0&res=25&view=simple&phrase=1&column=def",
-        "https://1lib.nz/s/"+search_term.replace("+", "%20")
+        "https://libgen.is/search.php?req=" + search_term + "&open=0&res=100&view=simple&phrase=1&column=def"
       ]
       break;
       case "audiobooks":
