@@ -1,6 +1,6 @@
 # [HipFlask](https://hip-flask.herokuapp.com/)
 
-# Heroku has killed the free tier so I will no longer be updating this in any way.
+# Heroku has killed the free tier so I will no longer be updating this in any way. See https://github.com/team-hunting/HipFlask instead
 
 ## What makes this project interesting?
 - Overview: This is a Flask app optimized for deployment on Heroku through the use of Gunicorn WSGI (Web Server Gateway Interface) HTTP Server and other Heroku settings as detailed below. This app uses Bootstrap 5.1 elements for the UI.  
